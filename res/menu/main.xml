@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+	<item android:id="@+id/menuDuplicity"
+          android:title="@string/duplicity" />
+	<item android:title="@string/import_">
+		<menu>
+			<item android:id="@+id/menuImportText"
+				android:title="Import text" />
+			<item android:id="@+id/menuImportCsv"
+				android:title="Import CSV" />
+		</menu>
+	</item>
+	<item android:title="@string/export">
+		<menu>
+			<item android:id="@+id/menuExportText"
+				android:title="@string/export_text" />
+			<item android:id="@+id/menuExportCsv"
+				android:title="@string/export_csv" />
+		</menu>
+	</item>
+	<item android:id="@+id/menuEraseDb"
+          android:title="@string/erase_db" />
+</menu>

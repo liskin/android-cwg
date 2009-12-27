@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resources>
+    <string name="app_name">CWG</string>
+    <string name="add_same">Přidat stejný</string>
+    <string name="add_other_version">Přidat jinou verzi</string>
+    <string name="copy">Kopírovat</string>
+    <string name="remove">Odebrat</string>
+    <string name="duplicity">Duplikáty</string>
+    <string name="import_">Import</string>
+    <string name="export">Export</string>
+    <string name="import_text">Importovat text</string>
+    <string name="export_text">Exportovat text</string>
+    <string name="import_csv">Importovat CSV</string>
+    <string name="export_csv">Exportovat CSV</string>
+    <string name="erase_db">Smazat DB</string>
+    <string name="version">Verze:</string>
+    <string name="count">Počet:</string>
+	<string name="erase_database">Smazat databázi?</string>
+	<string name="are_you_sure_clean_whole_db">Opravdu chcete vymazat celou databázi?</string>
+</resources>
