@@ -1,11 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--
+	This file is part of Android-CWG.
+
+	Android-CWG is free software: you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation, either version 3 of the License, or
+	(at your option) any later version.
+
+	Android-CWG is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+
+	You should have received a copy of the GNU General Public License
+	along with Android-CWG.  If not, see <http://www.gnu.org/licenses/>.
+-->
+
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 	<item android:id="@+id/menuAddSame"
-          android:title="@string/add_same" />
+		android:title="@string/add_same" />
 	<item android:id="@+id/menuAddOther"
-          android:title="@string/add_other_version" />
+		android:title="@string/add_other_version" />
 	<item android:id="@+id/menuCopy"
-          android:title="@string/copy" />
+		android:title="@string/copy" />
 	<item android:id="@+id/menuRemove"
-          android:title="@string/remove" />
+		android:title="@string/remove" />
 </menu>
