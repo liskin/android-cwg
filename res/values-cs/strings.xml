@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <!--
 	This file is part of Android-CWG.
 
@@ -15,7 +16,6 @@
 	along with Android-CWG.  If not, see <http://www.gnu.org/licenses/>.
 -->
 
-<?xml version="1.0" encoding="UTF-8"?>
 <resources>
 	<string name="app_name">CWG</string>
 	<string name="add_same">Přidat stejný</string>
