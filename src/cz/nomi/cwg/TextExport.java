@@ -22,8 +22,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 public class TextExport extends Export {
-	public TextExport(OutputStream output) {
-		super(output);
+	public TextExport() {
 	}
 
 	public void exportData(Cursor cursor) throws IOException {

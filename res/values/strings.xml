@@ -34,4 +34,12 @@
 	<string name="count">Count:</string>
 	<string name="erase_database">Erase database?</string>
 	<string name="are_you_sure_clean_whole_db">Are you sure clean whole DB?</string>
+	<string name="statistics">Statistics</string>
+	<string name="cwg_statistics">CWG Statistics</string>
+	<string name="cwg_count">CWG count:</string>
+	<string name="unique_cwg">Unique CWG:</string>
+	<string name="duplicate_cwg">Duplicate CWG:</string>
+	<string name="importing">Importing</string>
+	<string name="exporting">Exporting</string>
+	<string name="please_wait">Please wait...</string>
 </resources>

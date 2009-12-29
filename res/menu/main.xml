@@ -22,9 +22,9 @@
 	<item android:title="@string/import_">
 		<menu>
 			<item android:id="@+id/menuImportText"
-				android:title="Import text" />
+				android:title="@string/import_text" />
 			<item android:id="@+id/menuImportCsv"
-				android:title="Import CSV" />
+				android:title="@string/import_csv" />
 		</menu>
 	</item>
 	<item android:title="@string/export">
@@ -35,6 +35,8 @@
 				android:title="@string/export_csv" />
 		</menu>
 	</item>
+	<item android:id="@+id/menuStatistics"
+		android:title="@string/statistics" />
 	<item android:id="@+id/menuEraseDb"
 		android:title="@string/erase_db" />
 </menu>

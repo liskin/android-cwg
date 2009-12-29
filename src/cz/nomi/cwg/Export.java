@@ -24,7 +24,10 @@ import java.io.OutputStream;
 public abstract class Export {
 	protected OutputStream output;
 
-	public Export(OutputStream output) {
+	public Export() {
+	}
+
+	public void setOutput(OutputStream output) {
 		this.output = output;
 	}
 

@@ -41,6 +41,15 @@ public class DatabaseAdapter {
 		databaseHelper.close();
 	}
 
+	public void beginTransaction() {
+		db.beginTransaction();
+	}
+
+	public void endTransaction() {
+		db.setTransactionSuccessful();
+		db.endTransaction();
+	}
+
 	public Cursor getCwg(long id) {
 		Cursor cursor =
 			db.query("cwg, title", new String[]{
@@ -129,6 +138,7 @@ public class DatabaseAdapter {
 				null,
 				null);
 		if (mCursor == null) {
+			db.endTransaction();
 			return;
 		}
 		long titleId;
@@ -140,6 +150,7 @@ public class DatabaseAdapter {
 			val.put("title", title);
 			titleId = db.insert("title", null, val);
 		}
+		mCursor.close();
 
 		// CWG
 		mCursor =
@@ -152,6 +163,7 @@ public class DatabaseAdapter {
 				null,
 				null);
 		if (mCursor == null) {
+			db.endTransaction();
 			return;
 		}
 		if (mCursor.getCount() > 0) {
@@ -159,7 +171,9 @@ public class DatabaseAdapter {
 			mCursor.moveToFirst();
 			long cwgId = mCursor.getLong(0);
 			db.execSQL("UPDATE cwg SET count = count + 1 WHERE _id = " + Long.toString(cwgId));
+			mCursor.close();
 		} else {
+			mCursor.close();
 			// Insert
 			if (version == 0) {
 				mCursor =
@@ -172,6 +186,7 @@ public class DatabaseAdapter {
 					null,
 					null);
 				if (mCursor == null) {
+					db.endTransaction();
 					return;
 				}
 				if (mCursor.getCount() > 0) {
@@ -180,6 +195,7 @@ public class DatabaseAdapter {
 				} else {
 					version = 1;
 				}
+				mCursor.close();
 			}
 			ContentValues val = new ContentValues();
 			val.put("title_id", titleId);
@@ -208,6 +224,7 @@ public class DatabaseAdapter {
 			return;
 		}
 		if (mCursor.getCount() == 0) {
+			mCursor.close();
 			return;
 		}
 		mCursor.moveToFirst();
@@ -218,10 +235,80 @@ public class DatabaseAdapter {
 			// Delete
 			db.delete("cwg", "_id = " + id, null);
 		}
+		mCursor.close();
 	}
 
-	public void cleanDb() {
+	public void eraseDb() {
 		db.delete("cwg", null, null);
 		db.delete("title", null, null);
+	}
+
+	public int countCwgSumCount() {
+		Cursor mCursor =
+				db.query(false, "cwg", new String[]{
+					"SUM(count)",},
+				null,
+				null,
+				null,
+				null,
+				null,
+				null);
+		if (mCursor == null) {
+			return 0;
+		}
+		if (mCursor.getCount() == 0) {
+			mCursor.close();
+			return 0;
+		}
+		mCursor.moveToFirst();
+		int count = mCursor.getInt(0);
+		mCursor.close();
+		return count;
+	}
+
+	public int countCwg() {
+		Cursor mCursor =
+				db.query(false, "cwg", new String[]{
+					"COUNT(*)"},
+				null,
+				null,
+				null,
+				null,
+				null,
+				null);
+		if (mCursor == null) {
+			return 0;
+		}
+		if (mCursor.getCount() == 0) {
+			mCursor.close();
+			return 0;
+		}
+		mCursor.moveToFirst();
+		int count = mCursor.getInt(0);
+		mCursor.close();
+		return count;
+	}
+
+	public int countCwgDuplicity() {
+		Cursor mCursor =
+				db.query(false, "cwg", new String[]{
+					"COUNT(*)"},
+				"count > 1",
+				null,
+				null,
+				null,
+				null,
+				null);
+		if (mCursor == null) {
+			return 0;
+		}
+		if (mCursor.getCount() == 0) {
+			mCursor.close();
+			return 0;
+		}
+		mCursor.moveToFirst();
+		int count = mCursor.getInt(0);
+		mCursor.close();
+		return count;
 	}
 }

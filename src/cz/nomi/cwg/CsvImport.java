@@ -26,8 +26,7 @@ import java.io.InputStreamReader;
 public class CsvImport extends Import {
 	private static final String TAG = "CwgCsvImport";
 
-	public CsvImport(InputStream input) {
-		super(input);
+	public CsvImport() {
 	}
 
 	public void importData(DatabaseAdapter db) throws IOException {

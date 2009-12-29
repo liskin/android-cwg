@@ -23,7 +23,10 @@ import java.io.InputStream;
 public abstract class Import {
 	protected InputStream input;
 
-	public Import(InputStream input) {
+	public Import() {
+	}
+
+	public void setInput(InputStream input) {
 		this.input = input;
 	}
 

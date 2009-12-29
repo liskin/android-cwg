@@ -19,21 +19,26 @@ public final class R {
         public static final int listItemCount=0x7f060002;
         public static final int listItemTitle=0x7f060000;
         public static final int listItemVersion=0x7f060001;
-        public static final int menuAddOther=0x7f060007;
-        public static final int menuAddSame=0x7f060006;
-        public static final int menuCopy=0x7f060008;
-        public static final int menuDuplicity=0x7f06000a;
-        public static final int menuEraseDb=0x7f06000f;
-        public static final int menuExportCsv=0x7f06000e;
-        public static final int menuExportText=0x7f06000d;
-        public static final int menuImportCsv=0x7f06000c;
-        public static final int menuImportText=0x7f06000b;
-        public static final int menuRemove=0x7f060009;
+        public static final int menuAddOther=0x7f06000a;
+        public static final int menuAddSame=0x7f060009;
+        public static final int menuCopy=0x7f06000b;
+        public static final int menuDuplicity=0x7f06000d;
+        public static final int menuEraseDb=0x7f060013;
+        public static final int menuExportCsv=0x7f060011;
+        public static final int menuExportText=0x7f060010;
+        public static final int menuImportCsv=0x7f06000f;
+        public static final int menuImportText=0x7f06000e;
+        public static final int menuRemove=0x7f06000c;
+        public static final int menuStatistics=0x7f060012;
         public static final int search=0x7f060003;
+        public static final int stats_cwg_count=0x7f060006;
+        public static final int stats_cwg_duplicity=0x7f060008;
+        public static final int stats_cwg_unique=0x7f060007;
     }
     public static final class layout {
         public static final int list_item=0x7f030000;
         public static final int main=0x7f030001;
+        public static final int stats=0x7f030002;
     }
     public static final class menu {
         public static final int context=0x7f050000;
@@ -46,16 +51,24 @@ public final class R {
         public static final int are_you_sure_clean_whole_db=0x7f040010;
         public static final int copy=0x7f040003;
         public static final int count=0x7f04000e;
+        public static final int cwg_count=0x7f040013;
+        public static final int cwg_statistics=0x7f040012;
+        public static final int duplicate_cwg=0x7f040015;
         public static final int duplicity=0x7f040005;
         public static final int erase_database=0x7f04000f;
         public static final int erase_db=0x7f04000c;
         public static final int export=0x7f040007;
         public static final int export_csv=0x7f04000b;
         public static final int export_text=0x7f040009;
+        public static final int exporting=0x7f040017;
         public static final int import_=0x7f040006;
         public static final int import_csv=0x7f04000a;
         public static final int import_text=0x7f040008;
+        public static final int importing=0x7f040016;
+        public static final int please_wait=0x7f040018;
         public static final int remove=0x7f040004;
+        public static final int statistics=0x7f040011;
+        public static final int unique_cwg=0x7f040014;
         public static final int version=0x7f04000d;
     }
 }

@@ -19,11 +19,13 @@ package cz.nomi.cwg;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
-import android.content.res.Resources;
+import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
 import android.text.ClipboardManager;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -156,6 +158,82 @@ public class MainActivity extends Activity {
 		return true;
 	}
 
+	private void doImport(final Import importer, final String fileName) {
+				final ProgressDialog progress = new ProgressDialog(this);
+				progress.setIndeterminate(true);
+				progress.setCancelable(false);
+				progress.setMessage(getText(R.string.please_wait));
+				progress.setTitle(R.string.importing);
+				progress.show();
+
+				final Handler handler = new Handler();
+				new Thread() {
+					@Override
+					public void run() {
+						File root = Environment.getExternalStorageDirectory();
+						if (root.canRead()) {
+							try {
+								File file = new File(root, fileName);
+								InputStream in = new FileInputStream(file);
+								importer.setInput(in);
+								db.beginTransaction();
+								importer.importData(db);
+								db.endTransaction();
+								in.close();
+							} catch (IOException e) {
+								Log.e(null, "Could not read from file " + e.getMessage());
+							}
+						}
+
+						handler.post(new Runnable() {
+							public void run() {
+								listCursor.requery();
+								listAdapter.notifyDataSetInvalidated();
+								listAdapter.notifyDataSetChanged();
+								progress.dismiss();
+							}
+						});
+					}
+				}.start();
+	}
+
+	private void doExport(final Export exporter, final String fileName) {
+				final ProgressDialog progress = new ProgressDialog(this);
+				progress.setIndeterminate(true);
+				progress.setCancelable(false);
+				progress.setMessage(getText(R.string.please_wait));
+				progress.setTitle(R.string.exporting);
+				progress.show();
+
+				final Handler handler = new Handler();
+				new Thread() {
+					@Override
+					public void run() {
+						File root = Environment.getExternalStorageDirectory();
+						if (root.canWrite()) {
+							try {
+								File file = new File(root, fileName);
+								OutputStream out = new FileOutputStream(file);
+								exporter.setOutput(out);
+								exporter.exportData(db.getAllCwg());
+								out.close();
+							} catch (IOException e) {
+								Log.e(null, "Could not write to file " + e.getMessage());
+							}
+						}
+
+						handler.post(new Runnable() {
+							public void run() {
+								listCursor.requery();
+								listAdapter.notifyDataSetInvalidated();
+								listAdapter.notifyDataSetChanged();
+								progress.dismiss();
+							}
+						});
+					}
+				}.start();
+	}
+
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
@@ -171,66 +249,24 @@ public class MainActivity extends Activity {
 				listAdapter.notifyDataSetChanged();
 				return true;
 			case R.id.menuExportText:
-				try {
-					File root = Environment.getExternalStorageDirectory();
-					if (root.canWrite()) {
-						File file = new File(root, "cwg.txt");
-						OutputStream out = new FileOutputStream(file);
-						TextExport export = new TextExport(out);
-						export.exportData(db.getAllCwg());
-						out.close();
-					}
-				} catch (IOException e) {
-					Log.e(null, "Could not write file " + e.getMessage());
-				}
+				TextExport textExport = new TextExport();
+				doExport(textExport, "cwg.txt");
 				return true;
 			case R.id.menuImportText:
-				try {
-					File root = Environment.getExternalStorageDirectory();
-					if (root.canRead()) {
-						File file = new File(root, "cwg.txt");
-						InputStream in = new FileInputStream(file);
-						TextImport tImport = new TextImport(in);
-						tImport.importData(db);
-						in.close();
-						listCursor.requery();
-						listAdapter.notifyDataSetInvalidated();
-						listAdapter.notifyDataSetChanged();
-					}
-				} catch (IOException e) {
-					Log.e(null, "Could not write file " + e.getMessage());
-				}
+				TextImport textImport = new TextImport();
+				doImport(textImport, "cwg.txt");
 				return true;
 			case R.id.menuExportCsv:
-				try {
-					File root = Environment.getExternalStorageDirectory();
-					if (root.canWrite()) {
-						File file = new File(root, "cwg.csv");
-						OutputStream out = new FileOutputStream(file);
-						CsvExport export = new CsvExport(out);
-						export.exportData(db.getAllCwg());
-						out.close();
-					}
-				} catch (IOException e) {
-					Log.e(null, "Could not write file " + e.getMessage());
-				}
+				CsvExport csvExport = new CsvExport();
+				doExport(csvExport, "cwg.csv");
 				return true;
 			case R.id.menuImportCsv:
-				try {
-					File root = Environment.getExternalStorageDirectory();
-					if (root.canRead()) {
-						File file = new File(root, "cwg.csv");
-						InputStream in = new FileInputStream(file);
-						CsvImport tImport = new CsvImport(in);
-						tImport.importData(db);
-						in.close();
-						listCursor.requery();
-						listAdapter.notifyDataSetInvalidated();
-						listAdapter.notifyDataSetChanged();
-					}
-				} catch (IOException e) {
-					Log.e(null, "Could not write file " + e.getMessage());
-				}
+				CsvImport csvImport = new CsvImport();
+				doImport(csvImport, "cwg.csv");
+				return true;
+			case R.id.menuStatistics:
+				Intent myIntent = new Intent(this, StatsActivity.class);
+				this.startActivity(myIntent);
 				return true;
 			case R.id.menuEraseDb:
 				AlertDialog dialog = new AlertDialog.Builder(this).create();
@@ -238,7 +274,7 @@ public class MainActivity extends Activity {
 				dialog.setMessage(getText(R.string.are_you_sure_clean_whole_db));
 				dialog.setButton(getText(android.R.string.ok), new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int which) {
-						db.cleanDb();
+						db.eraseDb();
 						listCursor.requery();
 						listAdapter.notifyDataSetInvalidated();
 						listAdapter.notifyDataSetChanged();
@@ -265,6 +301,7 @@ public class MainActivity extends Activity {
 		AdapterContextMenuInfo info = (AdapterContextMenuInfo) menuInfo;
 		Cursor cur = db.getCwg(info.id);
 		menu.setHeaderTitle(cur.getString(cur.getColumnIndex("title")));
+		cur.close();
 	}
 
 	@Override
@@ -277,6 +314,7 @@ public class MainActivity extends Activity {
 						cur.getString(cur.getColumnIndex("title")),
 						cur.getInt(cur.getColumnIndex("version"))
 				);
+				cur.close();
 				listCursor.requery();
 				listAdapter.notifyDataSetInvalidated();
 				listAdapter.notifyDataSetChanged();
@@ -287,6 +325,7 @@ public class MainActivity extends Activity {
 						cur2.getString(cur2.getColumnIndex("title")),
 						0
 				);
+				cur2.close();
 				listCursor.requery();
 				listAdapter.notifyDataSetInvalidated();
 				listAdapter.notifyDataSetChanged();
@@ -295,6 +334,7 @@ public class MainActivity extends Activity {
 				Cursor cur3 = db.getCwg(info.id);
 				ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
 				clipboard.setText(cur3.getString(cur3.getColumnIndex("title")));
+				cur3.close();
 				return true;
 			case R.id.menuRemove:
 				db.removeCwg(info.id);

@@ -23,8 +23,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 
 public class TextImport extends Import {
-	public TextImport(InputStream input) {
-		super(input);
+	public TextImport() {
 	}
 
 	public void importData(DatabaseAdapter db) throws IOException {

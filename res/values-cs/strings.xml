@@ -22,7 +22,7 @@
 	<string name="add_other_version">Přidat jinou verzi</string>
 	<string name="copy">Kopírovat</string>
 	<string name="remove">Odebrat</string>
-	<string name="duplicity">Duplikáty</string>
+	<string name="duplicity">Duplicity</string>
 	<string name="import_">Import</string>
 	<string name="export">Export</string>
 	<string name="import_text">Importovat text</string>
@@ -34,4 +34,12 @@
 	<string name="count">Počet:</string>
 	<string name="erase_database">Smazat databázi?</string>
 	<string name="are_you_sure_clean_whole_db">Opravdu chcete vymazat celou databázi?</string>
+	<string name="statistics">Statistika</string>
+	<string name="cwg_statistics">CWG statistika</string>
+	<string name="cwg_count">Počet CWG:</string>
+	<string name="unique_cwg">Unikátních CWG:</string>
+	<string name="duplicate_cwg">Duplicitních CWG:</string>
+	<string name="importing">Importuji</string>
+	<string name="exporting">Exportuji</string>
+	<string name="please_wait">Prosím čekejte</string>
 </resources>

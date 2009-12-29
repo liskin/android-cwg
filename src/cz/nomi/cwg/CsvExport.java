@@ -22,8 +22,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 public class CsvExport extends Export {
-	public CsvExport(OutputStream output) {
-		super(output);
+	public CsvExport() {
 	}
 
 	public void exportData(Cursor cursor) throws IOException {
