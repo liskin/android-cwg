@@ -19,25 +19,31 @@ package cz.nomi.cwg;
 
 import android.database.Cursor;
 import java.io.IOException;
-import java.io.OutputStream;
 
 public class CsvExport extends Export {
 	public CsvExport() {
 	}
 
 	public void exportData(Cursor cursor) throws IOException {
-		output.write("\"Title\";\"Version\";\"Count\"\n".getBytes("UTF-8"));
+		getOutput().write("\"Title\";\"Catalog title\";\"Catalog ID\";\"JPG\";\"Count\"\n".getBytes("UTF-8"));
 		while (cursor.moveToNext()) {
 			StringBuffer buffer = new StringBuffer();
+			String catalogTitle = cursor.getString(cursor.getColumnIndex("catalog_title"));
+			String catalogId = cursor.getString(cursor.getColumnIndex("catalog_id"));
+			String jpg = cursor.getString(cursor.getColumnIndex("jpg"));
 			buffer.append("\"");
 			buffer.append(cursor.getString(cursor.getColumnIndex("title")).replace("\"", "\\\""));
 			buffer.append("\";\"");
-			buffer.append(cursor.getInt(cursor.getColumnIndex("version")));
+			buffer.append(catalogTitle == null ? "" : catalogTitle);
+			buffer.append("\";\"");
+			buffer.append(catalogId == null ? "" : catalogId);
+			buffer.append("\";\"");
+			buffer.append(jpg == null ? "" : jpg);
 			buffer.append("\";\"");
 			buffer.append(cursor.getInt(cursor.getColumnIndex("count")));
 			buffer.append("\"");
 			buffer.append("\n");
-			output.write(
+			getOutput().write(
 				buffer.toString().getBytes("UTF-8")
 			);
 		}

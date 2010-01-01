@@ -22,6 +22,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
 
 public class DatabaseAdapter {
 	private Context context;
@@ -52,165 +53,156 @@ public class DatabaseAdapter {
 
 	public Cursor getCwg(long id) {
 		Cursor cursor =
-			db.query("cwg, title", new String[]{
-					"cwg._id",
-					"title.title AS title",
-					"cwg.version AS version",
-					"cwg.count AS count"},
-				"cwg.title_id = title._id AND cwg._id = " + id,
+			db.query("cwg", new String[]{
+					"_id",
+					"title",
+					"catalog_title",
+					"catalog_id",
+					"jpg",
+					"count"},
+				"_id = " + id,
 				null,
 				null,
 				null,
-				"title.title, cwg.version");
+				null);
 		cursor.moveToFirst();
-		return cursor;
+		if (cursor != null && cursor.getCount() == 1) {
+			cursor.moveToFirst();
+			return cursor;
+		} else {
+			return null;
+		}
+	}
+
+	public Cursor getCwgByCatalogId(String catalogId) {
+		Cursor cursor =
+			db.query("cwg", new String[]{
+					"_id",
+					"title",
+					"catalog_title",
+					"catalog_id",
+					"jpg",
+					"count"},
+				"catalog_id = ?",
+				new String[] {
+					catalogId
+				},
+				null,
+				null,
+				null);
+		if (cursor == null) {
+			return null;
+		}
+		if (cursor.getCount() == 1) {
+			cursor.moveToFirst();
+			return cursor;
+		} else {
+			cursor.close();
+			return null;
+		}
 	}
 
 	public Cursor getAllCwg() {
-		return db.query("cwg, title", new String[]{
-					"cwg._id",
-					"title.title",
-					"cwg.version",
-					"cwg.count"},
-				"cwg.title_id = title._id",
+		return db.query("cwg", new String[]{
+					"_id",
+					"title",
+					"catalog_title",
+					"catalog_id",
+					"jpg",
+					"count"},
+				"count > 0",
 				null,
 				null,
 				null,
-				"title.title, cwg.version");
+				"title, catalog_id");
 	}
 
 	public Cursor getDuplicityCwg() {
-		return db.query("cwg, title", new String[]{
-					"cwg._id",
-					"title.title",
-					"cwg.version",
-					"cwg.count"},
-				"cwg.title_id = title._id AND count > 1",
+		return db.query("cwg", new String[]{
+					"_id",
+					"title",
+					"catalog_title",
+					"catalog_id",
+					"jpg",
+					"count"},
+				"count > 1",
 				null,
 				null,
 				null,
-				"title.title, cwg.version");
+				"title, catalog_id");
 	}
 
 	public Cursor getFilteredCwg(String title) {
-		return db.query("cwg, title", new String[]{
-					"cwg._id",
-					"title.title",
-					"cwg.version",
-					"cwg.count"},
-				"cwg.title_id = title._id AND title LIKE '%' || ? || '%'",
+		if (title == null || title.length() == 0) {
+			return this.getAllCwg();
+		}
+		return db.query("cwg", new String[]{
+					"_id",
+					"title",
+					"catalog_title",
+					"catalog_id",
+					"jpg",
+					"count"},
+				"title LIKE '%' || ? || '%'",
 				new String[]{
 					title
 				},
 				null,
 				null,
-				"title.title, cwg.version");
+				"count > 0 DESC, title, catalog_id");
 	}
 
 	public Cursor getDuplicityFilteredCwg(String title) {
 		return db.query("cwg, title", new String[]{
-					"cwg._id",
-					"title.title",
-					"cwg.version",
-					"cwg.count"},
-				"cwg.title_id = title._id AND count > 1 AND title LIKE '%' || ? || '%'",
+					"_id",
+					"title",
+					"catalog_title",
+					"catalog_id",
+					"jpg",
+					"count"},
+				"count > 1 AND title LIKE '%' || ? || '%'",
 				new String[]{
 					title
 				},
 				null,
 				null,
-				"title.title");
+				"title, catalog_id");
 	}
 
-	public void addCwg(String title, int version) {
-		db.beginTransaction();
-
-		// Title
-		Cursor mCursor =
-				db.query(true, "title", new String[]{
-					"_id",},
-				"title = ?",
-				new String[]{
-					title
-				},
-				null,
-				null,
-				null,
-				null);
-		if (mCursor == null) {
-			db.endTransaction();
-			return;
-		}
-		long titleId;
-		if (mCursor.getCount() > 0) {
-			mCursor.moveToFirst();
-			titleId = mCursor.getLong(0);
-		} else {
-			ContentValues val = new ContentValues();
-			val.put("title", title);
-			titleId = db.insert("title", null, val);
-		}
-		mCursor.close();
-
-		// CWG
-		mCursor =
-				db.query(true, "cwg", new String[]{
-					"_id",},
-				"title_id = " + titleId + " AND version = " + version,
-				null,
-				null,
-				null,
-				null,
-				null);
-		if (mCursor == null) {
-			db.endTransaction();
-			return;
-		}
-		if (mCursor.getCount() > 0) {
-			// Update
-			mCursor.moveToFirst();
-			long cwgId = mCursor.getLong(0);
-			db.execSQL("UPDATE cwg SET count = count + 1 WHERE _id = " + Long.toString(cwgId));
-			mCursor.close();
-		} else {
-			mCursor.close();
-			// Insert
-			if (version == 0) {
-				mCursor =
-					db.query(false, "cwg", new String[]{
-						"MAX(version)",},
-					"title_id = " + titleId,
-					null,
-					null,
-					null,
-					null,
-					null);
-				if (mCursor == null) {
-					db.endTransaction();
-					return;
-				}
-				if (mCursor.getCount() > 0) {
-					mCursor.moveToFirst();
-					version = mCursor.getInt(0) + 1;
-				} else {
-					version = 1;
-				}
-				mCursor.close();
-			}
-			ContentValues val = new ContentValues();
-			val.put("title_id", titleId);
-			val.put("version", version);
-			val.put("count", 1);
-			titleId = db.insert("cwg", null, val);
-		}
-
-		db.setTransactionSuccessful();
-		db.endTransaction();
+	public void addCwg(String title, String catalogTitle, String catalogId, String jpg, int count) {
+		ContentValues val = new ContentValues();
+		val.put("title", title);
+		val.put("catalog_title", catalogTitle);
+		val.put("catalog_id", catalogId);
+		val.put("jpg", jpg);
+		val.put("count", count);
+		db.insert("cwg", null, val);
 
 		return;
 	}
 
-	public void removeCwg(long id) {
+	public void deleteCwg(long id) {
+		db.delete("cwg", "_id = " + id, null);
+
+		return;
+	}
+
+	public void updateCwg(long id, String title, String catalogTitle,
+			String catalogId, String jpg, int count) {
+		ContentValues val = new ContentValues();
+		val.put("title", title);
+		val.put("catalog_title", catalogTitle);
+		val.put("catalog_id", catalogId);
+		val.put("jpg", jpg);
+		val.put("count", count);
+		db.update("cwg", val, "_id = " + id, null);
+	}
+
+	public void incCwg(long id) {
+		db.execSQL("UPDATE cwg SET count = count + 1 WHERE _id = " + id);
+	}
+
+	public void decCwg(long id) {
 		Cursor mCursor =
 				db.query(true, "cwg", new String[]{
 					"count",},
@@ -228,19 +220,17 @@ public class DatabaseAdapter {
 			return;
 		}
 		mCursor.moveToFirst();
-		if (mCursor.getInt(0) > 1) {
+		if (mCursor.getInt(0) > 0) {
 			// Update
 			db.execSQL("UPDATE cwg SET count = count - 1 WHERE _id = " + id);
 		} else {
-			// Delete
-			db.delete("cwg", "_id = " + id, null);
+			Log.e(null, "Try to remove zero CWG");
 		}
 		mCursor.close();
 	}
 
 	public void eraseDb() {
 		db.delete("cwg", null, null);
-		db.delete("title", null, null);
 	}
 
 	public int countCwgSumCount() {
@@ -270,7 +260,7 @@ public class DatabaseAdapter {
 		Cursor mCursor =
 				db.query(false, "cwg", new String[]{
 					"COUNT(*)"},
-				null,
+				"count > 0",
 				null,
 				null,
 				null,

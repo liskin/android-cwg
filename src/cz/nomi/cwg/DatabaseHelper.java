@@ -19,10 +19,11 @@ package cz.nomi.cwg;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 class DatabaseHelper extends SQLiteOpenHelper {
 	private static final String DATABASE_NAME = "cwg";
-	private static final int DATABASE_VERSION = 1;
+	private static final int DATABASE_VERSION = 2;
 
 	DatabaseHelper(Context context) {
 		super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -30,15 +31,32 @@ class DatabaseHelper extends SQLiteOpenHelper {
 
 	@Override
 	public void onCreate(SQLiteDatabase db) {
-		db.execSQL("CREATE TABLE title (_id INTEGER PRIMARY KEY,"
-				+ "title VARCHAR NOT NULL COLLATE LOCALIZED);");
 		db.execSQL("CREATE TABLE cwg (_id INTEGER PRIMARY KEY,"
-				+ "title_id INT NOT NULL,"
-				+ "version INT NOT NULL,"
-				+ "count INT NOT NULL);");
+				+ "title VARCHAR NOT NULL COLLATE LOCALIZED,"
+				+ "catalog_title VARCHAR COLLATE LOCALIZED,"
+				+ "catalog_id VARCHAR,"
+				+ "jpg VARCHAR,"
+				+ "count INT NOT NULL)");
+		db.execSQL("CREATE UNIQUE INDEX cwg_catalog_id_uix ON cwg (catalog_id)");
 	}
 
 	@Override
 	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+		Log.d(null, "Upgrading from " + oldVersion + " to " + newVersion);
+		if (oldVersion == 1) {
+			db.execSQL("ALTER TABLE cwg RENAME TO _cwg");
+			db.execSQL("CREATE TABLE cwg (_id INTEGER PRIMARY KEY,"
+				+ "title VARCHAR NOT NULL COLLATE LOCALIZED,"
+				+ "catalog_title VARCHAR COLLATE LOCALIZED,"
+				+ "catalog_id VARCHAR,"
+				+ "jpg VARCHAR,"
+				+ "count INT NOT NULL)");
+			db.execSQL("CREATE UNIQUE INDEX cwg_catalog_id_uix ON cwg (catalog_id)");
+			db.execSQL("INSERT INTO cwg (title, count) " +
+					"SELECT title, count FROM _cwg JOIN title ON (_cwg.title_id = title._id)");
+			db.execSQL("DROP TABLE _cwg");
+			db.execSQL("DROP TABLE title");
+			oldVersion = 2;
+		}
 	}
 }

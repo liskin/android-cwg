@@ -20,7 +20,6 @@ package cz.nomi.cwg;
 import android.util.Log;
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 
 public class CsvImport extends Import {
@@ -30,11 +29,13 @@ public class CsvImport extends Import {
 	}
 
 	public void importData(DatabaseAdapter db) throws IOException {
-		BufferedReader reader = new BufferedReader(new InputStreamReader(input));
+		BufferedReader reader = new BufferedReader(new InputStreamReader(getInput()));
 		String line;
 		while ((line = reader.readLine()) != null) {
 			String title = "";
-			String version = "";
+			String catalogTitle = "";
+			String catalogId = "";
+			String jpg = "";
 			String count = "";
 			int col = 0;
 			int length = line.length();
@@ -60,9 +61,15 @@ public class CsvImport extends Import {
 						title += line.charAt(pos);
 						break;
 					case 1:
-						version += line.charAt(pos);
+						catalogTitle += line.charAt(pos);
 						break;
 					case 2:
+						catalogId += line.charAt(pos);
+						break;
+					case 3:
+						jpg += line.charAt(pos);
+						break;
+					case 4:
 						count += line.charAt(pos);
 						break;
 				}
@@ -70,17 +77,22 @@ public class CsvImport extends Import {
 			}
 
 			try {
-				int versionI = Integer.parseInt(version);
 				int countI = Integer.parseInt(count);
 				title = title.trim();
 				if (title.length() > 0) {
-					for (int i = 0 ; i < countI ; i++) {
-						db.addCwg(title, versionI);
+					if (catalogTitle.length() == 0) {
+						catalogTitle = null;
 					}
+					if (catalogId.length() == 0) {
+						catalogId = null;
+					}
+					if (jpg.length() == 0) {
+						jpg = null;
+					}
+					db.addCwg(title, catalogTitle, catalogId, jpg, countI);
 				}
 			} catch (NumberFormatException nfe) {
-				Log.d(TAG, "Version or count is not number, skipping:" +
-						" version=" + version +
+				Log.d(TAG, "Count is not number, skipping:" +
 						" count=" + count);
 			}
 		}

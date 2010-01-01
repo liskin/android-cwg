@@ -17,21 +17,25 @@
 
 package cz.nomi.cwg;
 
+import android.R.id;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.graphics.Shader.TileMode;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
+import android.preference.PreferenceManager;
 import android.text.ClipboardManager;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -45,12 +49,15 @@ import android.widget.FilterQueryProvider;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
+import android.widget.Toast;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.URL;
 
 public class MainActivity extends Activity {
 	DatabaseAdapter db;
@@ -80,12 +87,10 @@ public class MainActivity extends Activity {
 				listCursor,
 				new String[]{
 					"title",
-					"version",
 					"count"
 				},
 				new int[]{
 					R.id.listItemTitle,
-					R.id.listItemVersion,
 					R.id.listItemCount
 				});
 		listAdapter.setFilterQueryProvider(new FilterQueryProvider() {
@@ -127,7 +132,7 @@ public class MainActivity extends Activity {
 			public void onClick(View arg0) {
 				String title = search.getText().toString().trim();
 				if (title.length() > 0) {
-					db.addCwg(title, 0);
+					db.addCwg(title, null, null, null, 1);
 					listCursor.requery();
 					listAdapter.notifyDataSetInvalidated();
 					listAdapter.notifyDataSetChanged();
@@ -158,7 +163,37 @@ public class MainActivity extends Activity {
 		return true;
 	}
 
-	private void doImport(final Import importer, final String fileName) {
+	private OutputStream newFileOutput(String fileName) {
+		File root = Environment.getExternalStorageDirectory();
+		if (root.canRead()) {
+			File file = new File(root, fileName);
+			try {
+				OutputStream out = new FileOutputStream(file);
+				return out;
+			} catch (FileNotFoundException fnfe) {
+				return null;
+			}
+		} else {
+			return null;
+		}
+	}
+
+	private InputStream newFileInput(String fileName) {
+		File root = Environment.getExternalStorageDirectory();
+		if (root.canWrite()) {
+			File file = new File(root, fileName);
+			try {
+				InputStream in = new FileInputStream(file);
+				return in;
+			} catch (FileNotFoundException fnfe) {
+				return null;
+			}
+		} else {
+			return null;
+		}
+	}
+
+	private void doImport(final Import importer, final InputStream input) {
 				final ProgressDialog progress = new ProgressDialog(this);
 				progress.setIndeterminate(true);
 				progress.setCancelable(false);
@@ -170,19 +205,14 @@ public class MainActivity extends Activity {
 				new Thread() {
 					@Override
 					public void run() {
-						File root = Environment.getExternalStorageDirectory();
-						if (root.canRead()) {
-							try {
-								File file = new File(root, fileName);
-								InputStream in = new FileInputStream(file);
-								importer.setInput(in);
-								db.beginTransaction();
-								importer.importData(db);
-								db.endTransaction();
-								in.close();
-							} catch (IOException e) {
-								Log.e(null, "Could not read from file " + e.getMessage());
-							}
+						try {
+							importer.setInput(input);
+							db.beginTransaction();
+							importer.importData(db);
+							db.endTransaction();
+						} catch (IOException ioe) {
+							Toast.makeText(MainActivity.this, ioe.getClass().getName() +
+								": " + ioe.getMessage(), Toast.LENGTH_LONG).show();
 						}
 
 						handler.post(new Runnable() {
@@ -197,7 +227,7 @@ public class MainActivity extends Activity {
 				}.start();
 	}
 
-	private void doExport(final Export exporter, final String fileName) {
+	private void doExport(final Export exporter, final OutputStream output) {
 				final ProgressDialog progress = new ProgressDialog(this);
 				progress.setIndeterminate(true);
 				progress.setCancelable(false);
@@ -209,17 +239,12 @@ public class MainActivity extends Activity {
 				new Thread() {
 					@Override
 					public void run() {
-						File root = Environment.getExternalStorageDirectory();
-						if (root.canWrite()) {
-							try {
-								File file = new File(root, fileName);
-								OutputStream out = new FileOutputStream(file);
-								exporter.setOutput(out);
-								exporter.exportData(db.getAllCwg());
-								out.close();
-							} catch (IOException e) {
-								Log.e(null, "Could not write to file " + e.getMessage());
-							}
+						try {
+							exporter.setOutput(output);
+							exporter.exportData(db.getAllCwg());
+						} catch (IOException ioe) {
+							Toast.makeText(MainActivity.this, ioe.getClass().getName() +
+									": " + ioe.getMessage(), Toast.LENGTH_LONG).show();
 						}
 
 						handler.post(new Runnable() {
@@ -250,23 +275,40 @@ public class MainActivity extends Activity {
 				return true;
 			case R.id.menuExportText:
 				TextExport textExport = new TextExport();
-				doExport(textExport, "cwg.txt");
+				doExport(textExport, newFileOutput("cwg.txt"));
 				return true;
 			case R.id.menuImportText:
 				TextImport textImport = new TextImport();
-				doImport(textImport, "cwg.txt");
+				doImport(textImport, newFileInput("cwg.txt"));
 				return true;
 			case R.id.menuExportCsv:
 				CsvExport csvExport = new CsvExport();
-				doExport(csvExport, "cwg.csv");
+				doExport(csvExport, newFileOutput("cwg.csv"));
 				return true;
 			case R.id.menuImportCsv:
 				CsvImport csvImport = new CsvImport();
-				doImport(csvImport, "cwg.csv");
+				doImport(csvImport, newFileInput("cwg.csv"));
+				return true;
+			case R.id.menuImportCatalog:
+				try {
+					SharedPreferences settings =
+							PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+					String catalogUrl = settings.getString("catalog_url",
+							getText(R.string.pref_catalog_url).toString());
+
+					CatalogImport catalogImport = new CatalogImport();
+					URL url = new URL(catalogUrl);
+					doImport(catalogImport, url.openStream());
+				} catch (IOException ioe) {
+					Toast.makeText(this, ioe.getClass().getName() + ": " + ioe.getMessage(),
+							Toast.LENGTH_LONG).show();
+				}
 				return true;
 			case R.id.menuStatistics:
-				Intent myIntent = new Intent(this, StatsActivity.class);
-				this.startActivity(myIntent);
+				this.startActivity(new Intent(this, StatsActivity.class));
+				return true;
+			case R.id.menuPreference:
+				this.startActivity(new Intent(this, PreferenceActivity.class));
 				return true;
 			case R.id.menuEraseDb:
 				AlertDialog dialog = new AlertDialog.Builder(this).create();
@@ -306,41 +348,97 @@ public class MainActivity extends Activity {
 
 	@Override
 	public boolean onContextItemSelected(MenuItem item) {
-		AdapterContextMenuInfo info = (AdapterContextMenuInfo) item.getMenuInfo();
+		final AdapterContextMenuInfo info = (AdapterContextMenuInfo) item.getMenuInfo();
+		Cursor cur;
 		switch (item.getItemId()) {
+			case R.id.menuShow:
+				Intent myIntent = new Intent(this, ShowActivity.class);
+				myIntent.putExtra("cwgId", info.id);
+				this.startActivity(myIntent);
+				return true;
 			case R.id.menuAddSame:
-				Cursor cur = db.getCwg(info.id);
+				db.incCwg(info.id);
+				listCursor.requery();
+				listAdapter.notifyDataSetInvalidated();
+				listAdapter.notifyDataSetChanged();
+				return true;
+			case R.id.menuAddOther:
+				cur = db.getCwg(info.id);
 				db.addCwg(
 						cur.getString(cur.getColumnIndex("title")),
-						cur.getInt(cur.getColumnIndex("version"))
+						null,
+						null,
+						null,
+						1
 				);
 				cur.close();
 				listCursor.requery();
 				listAdapter.notifyDataSetInvalidated();
 				listAdapter.notifyDataSetChanged();
 				return true;
-			case R.id.menuAddOther:
-				Cursor cur2 = db.getCwg(info.id);
-				db.addCwg(
-						cur2.getString(cur2.getColumnIndex("title")),
-						0
-				);
-				cur2.close();
-				listCursor.requery();
-				listAdapter.notifyDataSetInvalidated();
-				listAdapter.notifyDataSetChanged();
+			case R.id.menuRename:
+				cur = db.getCwg(info.id);
+				final long id = info.id;
+				final String title = cur.getString(cur.getColumnIndex("title"));
+				final String catalogTitle = cur.getString(cur.getColumnIndex("catalog_title"));
+				final String catalogId = cur.getString(cur.getColumnIndex("catalog_id"));
+				final String jpg = cur.getString(cur.getColumnIndex("jpg"));
+				final int count = cur.getInt(cur.getColumnIndex("count"));
+				cur.close();
+
+				LayoutInflater factory = LayoutInflater.from(this);
+				final View textEntryView = factory.inflate(R.layout.dialog_rename, null);
+				final EditText edit = (EditText) textEntryView.findViewById(R.id.rename_title);
+				edit.setText(title);
+				cur.close();
+				AlertDialog alertDialog = new AlertDialog.Builder(this).create();
+				alertDialog.setTitle(catalogTitle);
+				alertDialog.setView(textEntryView);
+				alertDialog.setButton(getText(android.R.string.ok), new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int which) {
+						db.updateCwg(id, edit.getText().toString(), catalogTitle, catalogId, jpg, count);
+						listCursor.requery();
+						listAdapter.notifyDataSetInvalidated();
+						listAdapter.notifyDataSetChanged();
+					}
+				});
+				alertDialog.setButton2(getText(android.R.string.cancel), new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int which) {
+						return;
+					}
+				});
+				alertDialog.show();
 				return true;
 			case R.id.menuCopy:
-				Cursor cur3 = db.getCwg(info.id);
+				cur = db.getCwg(info.id);
 				ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
-				clipboard.setText(cur3.getString(cur3.getColumnIndex("title")));
-				cur3.close();
+				clipboard.setText(cur.getString(cur.getColumnIndex("title")));
+				cur.close();
 				return true;
-			case R.id.menuRemove:
-				db.removeCwg(info.id);
+			case R.id.menuRemoveOne:
+				db.decCwg(info.id);
 				listCursor.requery();
 				listAdapter.notifyDataSetInvalidated();
 				listAdapter.notifyDataSetChanged();
+				return true;
+			case R.id.menuDelete:
+				AlertDialog dialog = new AlertDialog.Builder(this).create();
+				dialog.setTitle(R.string.delete_cwg);
+				dialog.setMessage(getText(R.string.are_you_sure_delete_cwg));
+				dialog.setButton(getText(android.R.string.ok), new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int which) {
+						db.deleteCwg(info.id);
+						listCursor.requery();
+						listAdapter.notifyDataSetInvalidated();
+						listAdapter.notifyDataSetChanged();
+					}
+				});
+				dialog.setButton2(getText(android.R.string.cancel), new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int which) {
+						return;
+					}
+				});
+				dialog.show();
 				return true;
 			default:
 				return super.onContextItemSelected(item);

@@ -22,13 +22,17 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 public abstract class Export {
-	protected OutputStream output;
+	private OutputStream output;
 
 	public Export() {
 	}
 
 	public void setOutput(OutputStream output) {
 		this.output = output;
+	}
+
+	protected OutputStream getOutput() {
+		return this.output;
 	}
 
 	public abstract void exportData(Cursor cursor) throws IOException;

@@ -21,13 +21,17 @@ import java.io.IOException;
 import java.io.InputStream;
 
 public abstract class Import {
-	protected InputStream input;
+	private InputStream input;
 
 	public Import() {
 	}
 
 	public void setInput(InputStream input) {
 		this.input = input;
+	}
+
+	protected InputStream getInput() {
+		return this.input;
 	}
 
 	public abstract void importData(DatabaseAdapter db) throws IOException;

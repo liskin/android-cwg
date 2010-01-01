@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!--
+/*
 	This file is part of Android-CWG.
 
 	Android-CWG is free software: you can redistribute it and/or modify
@@ -14,21 +13,19 @@
 
 	You should have received a copy of the GNU General Public License
 	along with Android-CWG.  If not, see <http://www.gnu.org/licenses/>.
--->
+*/
 
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
-	<item android:id="@+id/menuShow"
-		android:title="@string/show" />
-	<item android:id="@+id/menuAddSame"
-		android:title="@string/add_same" />
-	<item android:id="@+id/menuAddOther"
-		android:title="@string/add_other_version" />
-	<item android:id="@+id/menuRename"
-		android:title="@string/rename" />
-	<item android:id="@+id/menuCopy"
-		android:title="@string/copy" />
-	<item android:id="@+id/menuRemoveOne"
-		android:title="@string/remove_one" />
-	<item android:id="@+id/menuDelete"
-		android:title="@string/delete" />
-</menu>
+package cz.nomi.cwg;
+
+import android.os.Bundle;
+
+public class PreferenceActivity extends android.preference.PreferenceActivity {
+	DatabaseAdapter db;
+
+	@Override
+    public void onCreate(Bundle icicle) {
+        super.onCreate(icicle);
+
+		addPreferencesFromResource(R.xml.preference);
+	}
+}

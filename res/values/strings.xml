@@ -17,29 +17,47 @@
 -->
 
 <resources>
-	<string name="app_name">CWG</string>
+	<string name="app_name">Czech Wood Geocoin</string>
+	<string name="main_activity">CWG</string>
+	<string name="preference_activity">CWG Preferences</string>
+	<string name="statistics_activity">CWG Statistics</string>
+	<string name="show_activity">CWG Detail</string>
+
+	<string name="pref_catalog_url">http://cwg.maxinoha.cz/cwg.xml</string>
+	<string name="pref_image_url">http://cwg.maxinoha.cz/img/</string>
+
+	<string name="show">Show</string>
 	<string name="add_same">Add same</string>
 	<string name="add_other_version">Add other version</string>
+	<string name="rename">Rename</string>
 	<string name="copy">Copy</string>
-	<string name="remove">Remove</string>
+	<string name="delete">Delete</string>
+	<string name="delete_cwg">Delete CWG?</string>
+	<string name="are_you_sure_delete_cwg">Are you sure delete this CWG?</string>
+	<string name="remove_one">Remove one</string>
+	<string name="decrement">Decrement</string>
 	<string name="duplicity">Duplicity</string>
 	<string name="import_">Import</string>
 	<string name="export">Export</string>
+	<string name="import_catalog">Import catalog</string>
 	<string name="import_text">Import text</string>
 	<string name="export_text">Export text</string>
 	<string name="import_csv">Import CSV</string>
 	<string name="export_csv">Export CSV</string>
+	<string name="preference">Preferences</string>
 	<string name="erase_db">Erase DB</string>
-	<string name="version">Version:</string>
-	<string name="count">Count:</string>
 	<string name="erase_database">Erase database?</string>
 	<string name="are_you_sure_clean_whole_db">Are you sure clean whole DB?</string>
 	<string name="statistics">Statistics</string>
-	<string name="cwg_statistics">CWG Statistics</string>
 	<string name="cwg_count">CWG count:</string>
 	<string name="unique_cwg">Unique CWG:</string>
 	<string name="duplicate_cwg">Duplicate CWG:</string>
 	<string name="importing">Importing</string>
 	<string name="exporting">Exporting</string>
 	<string name="please_wait">Please wait...</string>
+	<string name="title">Title:</string>
+	<string name="catalog_title">Catalog title:</string>
+	<string name="catalog_id">Catalog ID:</string>
+	<string name="count">Count:</string>
+	<string name="image">Image:</string>
 </resources>

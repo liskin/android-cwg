@@ -16,19 +16,16 @@
 	along with Android-CWG.  If not, see <http://www.gnu.org/licenses/>.
 -->
 
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
-	<item android:id="@+id/menuShow"
-		android:title="@string/show" />
-	<item android:id="@+id/menuAddSame"
-		android:title="@string/add_same" />
-	<item android:id="@+id/menuAddOther"
-		android:title="@string/add_other_version" />
-	<item android:id="@+id/menuRename"
-		android:title="@string/rename" />
-	<item android:id="@+id/menuCopy"
-		android:title="@string/copy" />
-	<item android:id="@+id/menuRemoveOne"
-		android:title="@string/remove_one" />
-	<item android:id="@+id/menuDelete"
-		android:title="@string/delete" />
-</menu>
+<PreferenceScreen
+	xmlns:android="http://schemas.android.com/apk/res/android">
+	<EditTextPreference
+		android:key="catalog_url"
+		android:title="Catalog URL"
+		android:defaultValue="@string/pref_catalog_url"
+		/>
+	<EditTextPreference
+		android:key="image_url"
+		android:title="Image URL"
+		android:defaultValue="@string/pref_image_url"
+		/>
+</PreferenceScreen>
