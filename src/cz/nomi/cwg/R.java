@@ -25,7 +25,7 @@ public final class R {
         public static final int listItemTitle=0x7f070001;
         public static final int menuAddOther=0x7f070010;
         public static final int menuAddSame=0x7f07000f;
-        public static final int menuCopy=0x7f070012;
+        public static final int menuCopy=0x7f070013;
         public static final int menuDelete=0x7f070015;
         public static final int menuDuplicity=0x7f070016;
         public static final int menuEraseDb=0x7f07001e;
@@ -36,8 +36,8 @@ public final class R {
         public static final int menuImportText=0x7f070018;
         public static final int menuMerge=0x7f070014;
         public static final int menuPreference=0x7f07001d;
-        public static final int menuRemoveOne=0x7f070013;
-        public static final int menuRename=0x7f070011;
+        public static final int menuRemoveOne=0x7f070011;
+        public static final int menuRename=0x7f070012;
         public static final int menuShow=0x7f07000e;
         public static final int menuStatistics=0x7f07001c;
         public static final int rename_title=0x7f070000;

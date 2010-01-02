@@ -34,6 +34,7 @@ import android.preference.PreferenceManager;
 import android.text.ClipboardManager;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.LayoutInflater;
@@ -57,8 +58,8 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.HttpURLConnection;
 import java.net.URL;
 
 public class MainActivity extends Activity {
@@ -72,9 +73,17 @@ public class MainActivity extends Activity {
 			if (index == cursor.getColumnIndex("title")) {
 				TextView textView = (TextView) view;
 				if (cursor.isNull(cursor.getColumnIndex("catalog_id"))) {
-					textView.setTypeface(Typeface.DEFAULT, Typeface.NORMAL);
+					if (cursor.getInt(cursor.getColumnIndex("count")) > 0) {
+						textView.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
+					} else {
+						textView.setTypeface(Typeface.DEFAULT, Typeface.NORMAL);
+					}
 				} else {
-					textView.setTypeface(Typeface.DEFAULT, Typeface.BOLD_ITALIC);
+					if (cursor.getInt(cursor.getColumnIndex("count")) > 0) {
+						textView.setTypeface(Typeface.DEFAULT, Typeface.BOLD_ITALIC);
+					} else {
+						textView.setTypeface(Typeface.DEFAULT, Typeface.ITALIC);
+					}
 				}
 
 				if (MainActivity.this.mergeId == cursor.getInt(cursor.getColumnIndex("_id"))) {
@@ -217,13 +226,15 @@ public class MainActivity extends Activity {
 		}
 	}
 
-	private InputStream newFileInput(String fileName) {
+	private ProgressInputStream newFileInput(String fileName) {
 		File root = Environment.getExternalStorageDirectory();
 		if (root.canWrite()) {
 			File file = new File(root, fileName);
 			try {
-				InputStream in = new FileInputStream(file);
-				return in;
+				return new ProgressInputStream(
+						this,
+						new FileInputStream(file),
+						file.length());
 			} catch (FileNotFoundException fnfe) {
 				return null;
 			}
@@ -232,38 +243,31 @@ public class MainActivity extends Activity {
 		}
 	}
 
-	private void doImport(final Import importer, final InputStream input) {
-				final ProgressDialog progress = new ProgressDialog(this);
-				progress.setIndeterminate(true);
-				progress.setCancelable(false);
-				progress.setMessage(getText(R.string.please_wait));
-				progress.setTitle(R.string.importing);
-				progress.show();
+	private void doImport(final Import importer, final ProgressInputStream input) {
+		final Handler handler = new Handler();
+		new Thread() {
+			@Override
+			public void run() {
+				try {
+					importer.setInput(input);
+					db.beginTransaction();
+					importer.importData(db);
+					db.endTransaction();
+					input.close();
+				} catch (IOException ioe) {
+					Toast.makeText(MainActivity.this, ioe.getClass().getName() +
+						": " + ioe.getMessage(), Toast.LENGTH_LONG).show();
+				}
 
-				final Handler handler = new Handler();
-				new Thread() {
-					@Override
+				handler.post(new Runnable() {
 					public void run() {
-						try {
-							importer.setInput(input);
-							db.beginTransaction();
-							importer.importData(db);
-							db.endTransaction();
-						} catch (IOException ioe) {
-							Toast.makeText(MainActivity.this, ioe.getClass().getName() +
-								": " + ioe.getMessage(), Toast.LENGTH_LONG).show();
-						}
-
-						handler.post(new Runnable() {
-							public void run() {
-								listCursor.requery();
-								listAdapter.notifyDataSetInvalidated();
-								listAdapter.notifyDataSetChanged();
-								progress.dismiss();
-							}
-						});
+						listCursor.requery();
+						listAdapter.notifyDataSetInvalidated();
+						listAdapter.notifyDataSetChanged();
 					}
-				}.start();
+				});
+			}
+		}.start();
 	}
 
 	private void doExport(final Export exporter, final OutputStream output) {
@@ -318,7 +322,8 @@ public class MainActivity extends Activity {
 				return true;
 			case R.id.menuImportText:
 				TextImport textImport = new TextImport();
-				doImport(textImport, newFileInput("cwg.txt"));
+				ProgressInputStream textIn = newFileInput("cwg.txt");
+				doImport(textImport, textIn);
 				return true;
 			case R.id.menuExportCsv:
 				CsvExport csvExport = new CsvExport();
@@ -326,7 +331,8 @@ public class MainActivity extends Activity {
 				return true;
 			case R.id.menuImportCsv:
 				CsvImport csvImport = new CsvImport();
-				doImport(csvImport, newFileInput("cwg.csv"));
+				ProgressInputStream csvIn = newFileInput("cwg.csv");
+				doImport(csvImport, csvIn);
 				return true;
 			case R.id.menuImportCatalog:
 				try {
@@ -337,7 +343,9 @@ public class MainActivity extends Activity {
 
 					CatalogImport catalogImport = new CatalogImport();
 					URL url = new URL(catalogUrl);
-					doImport(catalogImport, url.openStream());
+					HttpURLConnection http = (HttpURLConnection) url.openConnection();
+					doImport(catalogImport, new ProgressInputStream(this,
+							http.getInputStream(), http.getContentLength()));
 				} catch (IOException ioe) {
 					Toast.makeText(this, ioe.getClass().getName() + ": " + ioe.getMessage(),
 							Toast.LENGTH_LONG).show();
