@@ -108,6 +108,8 @@ public class ShowActivity extends Activity {
 					}
 				}
 			}.start();
+		} else {
+			imageProgress.setVisibility(View.GONE);
 		}
 	}
 
