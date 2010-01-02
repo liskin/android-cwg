@@ -73,11 +73,12 @@ public final class R {
         public static final int are_you_sure_delete_cwg=0x7f05000e;
         public static final int auto_merge=0x7f05001c;
         public static final int auto_merging=0x7f05001d;
+        public static final int cant_import_duplicity=0x7f05002f;
         public static final int cant_merge_both_have_catalog=0x7f05002d;
         public static final int cant_remove_zero=0x7f05002e;
         public static final int catalog_id=0x7f05002a;
         public static final int catalog_title=0x7f050029;
-        public static final int catalog_url=0x7f05002f;
+        public static final int catalog_url=0x7f050030;
         public static final int copy=0x7f05000b;
         public static final int count=0x7f05002b;
         public static final int cwg_count=0x7f050022;
@@ -93,7 +94,7 @@ public final class R {
         public static final int export_text=0x7f050018;
         public static final int exporting=0x7f050026;
         public static final int image=0x7f05002c;
-        public static final int image_url=0x7f050030;
+        public static final int image_url=0x7f050031;
         public static final int import_=0x7f050014;
         public static final int import_catalog=0x7f050016;
         public static final int import_csv=0x7f050019;

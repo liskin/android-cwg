@@ -25,6 +25,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.ColorStateList;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteConstraintException;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
@@ -34,7 +35,6 @@ import android.preference.PreferenceManager;
 import android.text.ClipboardManager;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.LayoutInflater;
@@ -260,15 +260,39 @@ public class MainActivity extends Activity {
 		new Thread() {
 			@Override
 			public void run() {
+				db.beginTransaction();
+				importer.setInput(input);
+				
 				try {
-					importer.setInput(input);
-					db.beginTransaction();
 					importer.importData(db);
-					db.endTransaction();
+				} catch (final SQLiteConstraintException se) {
+					handler.post(new Runnable() {
+						public void run() {
+							Toast.makeText(MainActivity.this,
+									getText(R.string.cant_import_duplicity),
+									Toast.LENGTH_LONG).show();
+						}
+					});
+				} catch (final IOException ioe) {
+					handler.post(new Runnable() {
+						public void run() {
+							Toast.makeText(MainActivity.this, ioe.getClass().getName() +
+								": " + ioe.getMessage(),	Toast.LENGTH_LONG).show();
+						}
+					});
+				}
+
+				db.endTransaction();
+
+				try {
 					input.close();
-				} catch (IOException ioe) {
-					Toast.makeText(MainActivity.this, ioe.getClass().getName() +
-						": " + ioe.getMessage(), Toast.LENGTH_LONG).show();
+				} catch (final IOException ioe) {
+					handler.post(new Runnable() {
+						public void run() {
+							Toast.makeText(MainActivity.this, ioe.getClass().getName() +
+								": " + ioe.getMessage(),	Toast.LENGTH_LONG).show();
+						}
+					});
 				}
 
 				handler.post(new Runnable() {
@@ -297,9 +321,13 @@ public class MainActivity extends Activity {
 						try {
 							exporter.setOutput(output);
 							exporter.exportData(db.getAllCwg());
-						} catch (IOException ioe) {
-							Toast.makeText(MainActivity.this, ioe.getClass().getName() +
-									": " + ioe.getMessage(), Toast.LENGTH_LONG).show();
+						} catch (final IOException ioe) {
+							handler.post(new Runnable() {
+								public void run() {
+									Toast.makeText(MainActivity.this, ioe.getClass().getName() +
+										": " + ioe.getMessage(), Toast.LENGTH_LONG).show();
+								}
+							});
 						}
 
 						handler.post(new Runnable() {

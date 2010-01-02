@@ -210,7 +210,7 @@ public class DatabaseAdapter {
 		val.put("catalog_id", catalogId);
 		val.put("jpg", jpg);
 		val.put("count", count);
-		db.insert("cwg", null, val);
+		db.insertOrThrow("cwg", null, val);
 
 		return;
 	}

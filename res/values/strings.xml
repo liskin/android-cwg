@@ -66,6 +66,7 @@
 	<string name="image">Image:</string>
 	<string name="cant_merge_both_have_catalog">Can't merge this CWGs - both have catalog ID</string>
 	<string name="cant_remove_zero">Can't remove zero CWG</string>
+	<string name="cant_import_duplicity">Can't import duplicate CWG</string>
 	<string name="catalog_url">Catalog URL</string>
 	<string name="image_url">Image URL</string>
 </resources>
