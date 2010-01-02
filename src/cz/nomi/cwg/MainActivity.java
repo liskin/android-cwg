@@ -87,7 +87,9 @@ public class MainActivity extends Activity {
 				}
 
 				if (MainActivity.this.mergeId == cursor.getInt(cursor.getColumnIndex("_id"))) {
-					oldColors = textView.getTextColors();
+					if (oldColors == null) {
+						oldColors = textView.getTextColors();
+					}
 					textView.setTextColor(Color.GREEN);
 				} else {
 					if (oldColors != null) {
