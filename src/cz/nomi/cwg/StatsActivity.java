@@ -22,7 +22,7 @@ import android.os.Bundle;
 import android.widget.TextView;
 
 public class StatsActivity extends Activity {
-	DatabaseAdapter db;
+	private DatabaseAdapter db;
 
 	@Override
     public void onCreate(Bundle icicle) {

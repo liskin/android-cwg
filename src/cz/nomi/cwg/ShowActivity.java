@@ -32,7 +32,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 public class ShowActivity extends Activity {
-	DatabaseAdapter db;
+	private DatabaseAdapter db;
 
 	@Override
     public void onCreate(Bundle icicle) {

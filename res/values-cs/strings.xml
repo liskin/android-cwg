@@ -32,6 +32,7 @@
 	<string name="delete_cwg">Smazat CWG?</string>
 	<string name="are_you_sure_delete_cwg">Opravdu chcete smazat toto CWG?</string>
 	<string name="remove_one">Odebrat jeden</string>
+	<string name="merge">Sloučit</string>
 	<string name="duplicity">Duplicity</string>
 	<string name="import_">Import</string>
 	<string name="export">Export</string>

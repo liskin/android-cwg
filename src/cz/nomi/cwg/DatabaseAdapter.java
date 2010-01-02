@@ -229,6 +229,50 @@ public class DatabaseAdapter {
 		mCursor.close();
 	}
 
+	public void mergeCwg(long id1, long id2) {
+		if (id1 == id2) {
+			return;
+		}
+
+		beginTransaction();
+
+		Cursor cur1 = getCwg(id1);
+		Cursor cur2 = getCwg(id2);
+
+		String title;
+		String catalogTitle;
+		String catalogId;
+		String jpg;
+		int count =
+			cur1.getInt(cur1.getColumnIndex("count")) +
+			cur2.getInt(cur2.getColumnIndex("count"));
+
+		if (cur1.isNull(cur1.getColumnIndex("catalog_id"))) {
+			title = cur1.getString(cur1.getColumnIndex("title"));
+			catalogTitle = cur2.getString(cur2.getColumnIndex("catalog_title"));
+			catalogId = cur2.getString(cur2.getColumnIndex("catalog_id"));
+			jpg = cur2.getString(cur2.getColumnIndex("jpg"));
+		} else {
+			if (cur2.isNull(cur2.getColumnIndex("catalog_id"))) {
+				title = cur2.getString(cur2.getColumnIndex("title"));
+				catalogTitle = cur1.getString(cur2.getColumnIndex("catalog_title"));
+				catalogId = cur1.getString(cur2.getColumnIndex("catalog_id"));
+				jpg = cur1.getString(cur2.getColumnIndex("jpg"));
+			} else {
+				endTransaction();
+				Log.e(null, "Both have catalog");
+				return;
+			}
+		}
+
+		cur1.close();
+		cur2.close();
+		deleteCwg(id2);
+		updateCwg(id1, title, catalogTitle, catalogId, jpg, count);
+
+		endTransaction();
+	}
+
 	public void eraseDb() {
 		db.delete("cwg", null, null);
 	}

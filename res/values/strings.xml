@@ -35,6 +35,7 @@
 	<string name="delete_cwg">Delete CWG?</string>
 	<string name="are_you_sure_delete_cwg">Are you sure delete this CWG?</string>
 	<string name="remove_one">Remove one</string>
+	<string name="merge">Merge</string>
 	<string name="decrement">Decrement</string>
 	<string name="duplicity">Duplicity</string>
 	<string name="import_">Import</string>

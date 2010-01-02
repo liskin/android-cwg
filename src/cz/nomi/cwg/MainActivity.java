@@ -17,15 +17,16 @@
 
 package cz.nomi.cwg;
 
-import android.R.id;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.ColorStateList;
 import android.database.Cursor;
-import android.graphics.Shader.TileMode;
+import android.graphics.Color;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
@@ -49,6 +50,7 @@ import android.widget.FilterQueryProvider;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
+import android.widget.TextView;
 import android.widget.Toast;
 import java.io.File;
 import java.io.FileInputStream;
@@ -60,10 +62,39 @@ import java.io.OutputStream;
 import java.net.URL;
 
 public class MainActivity extends Activity {
-	DatabaseAdapter db;
-	boolean duplicity = false;
-	SimpleCursorAdapter listAdapter;
-	Cursor listCursor;
+	class CustomViewBinder implements SimpleCursorAdapter.ViewBinder {
+		ColorStateList oldColors = null;
+
+		public CustomViewBinder() {
+		}
+
+		public boolean setViewValue(View view, Cursor cursor, int index) {
+			if (index == cursor.getColumnIndex("title")) {
+				TextView textView = (TextView) view;
+				if (cursor.isNull(cursor.getColumnIndex("catalog_id"))) {
+					textView.setTypeface(Typeface.DEFAULT, Typeface.NORMAL);
+				} else {
+					textView.setTypeface(Typeface.DEFAULT, Typeface.BOLD_ITALIC);
+				}
+
+				if (MainActivity.this.mergeId == cursor.getInt(cursor.getColumnIndex("_id"))) {
+					oldColors = textView.getTextColors();
+					textView.setTextColor(Color.GREEN);
+				} else {
+					if (oldColors != null) {
+						textView.setTextColor(oldColors);
+					}
+				}
+			}
+			return false;
+		}
+	}
+
+	private DatabaseAdapter db;
+	private boolean duplicity = false;
+	private SimpleCursorAdapter listAdapter;
+	private Cursor listCursor;
+	private long mergeId = 0;
 
 	@Override
 	public void onCreate(Bundle icicle) {
@@ -74,7 +105,6 @@ public class MainActivity extends Activity {
 		db = new DatabaseAdapter(this);
 		db.open();
 
-		final MainActivity activity = this;
 		final ListView list = (ListView) findViewById(R.id.list);
 		final EditText search = (EditText) findViewById(R.id.search);
 		final ImageView button = (ImageView) findViewById(R.id.button);
@@ -95,7 +125,7 @@ public class MainActivity extends Activity {
 				});
 		listAdapter.setFilterQueryProvider(new FilterQueryProvider() {
 			public Cursor runQuery(CharSequence arg0) {
-				if (activity.duplicity) {
+				if (MainActivity.this.duplicity) {
 					listCursor = db.getDuplicityFilteredCwg(arg0.toString());
 				} else {
 					listCursor = db.getFilteredCwg(arg0.toString());
@@ -103,6 +133,7 @@ public class MainActivity extends Activity {
 				return listCursor;
 			}
 		});
+		listAdapter.setViewBinder(new CustomViewBinder());
 		list.setAdapter(listAdapter);
 		list.setTextFilterEnabled(true);
 		registerForContextMenu(list);
@@ -142,8 +173,16 @@ public class MainActivity extends Activity {
 
 		// List click
 		list.setOnItemClickListener(new OnItemClickListener() {
-			public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
-				activity.openContextMenu(arg1);
+			public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long id) {
+				if (MainActivity.this.mergeId == 0) {
+					MainActivity.this.openContextMenu(arg1);
+				} else {
+					db.mergeCwg(MainActivity.this.mergeId, id);
+					listCursor.requery();
+					listAdapter.notifyDataSetInvalidated();
+					listAdapter.notifyDataSetChanged();
+					MainActivity.this.mergeId = 0;
+				}
 			}
 		});
 	}
@@ -417,6 +456,16 @@ public class MainActivity extends Activity {
 				return true;
 			case R.id.menuRemoveOne:
 				db.decCwg(info.id);
+				listCursor.requery();
+				listAdapter.notifyDataSetInvalidated();
+				listAdapter.notifyDataSetChanged();
+				return true;
+			case R.id.menuMerge:
+				if (this.mergeId == 0) {
+					this.mergeId = info.id;
+				} else {
+					this.mergeId = 0;
+				}
 				listCursor.requery();
 				listAdapter.notifyDataSetInvalidated();
 				listAdapter.notifyDataSetChanged();
