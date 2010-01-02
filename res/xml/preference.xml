@@ -20,12 +20,12 @@
 	xmlns:android="http://schemas.android.com/apk/res/android">
 	<EditTextPreference
 		android:key="catalog_url"
-		android:title="Catalog URL"
+		android:title="@string/catalog_url"
 		android:defaultValue="@string/pref_catalog_url"
 		/>
 	<EditTextPreference
 		android:key="image_url"
-		android:title="Image URL"
+		android:title="@string/image_url"
 		android:defaultValue="@string/pref_image_url"
 		/>
 </PreferenceScreen>
