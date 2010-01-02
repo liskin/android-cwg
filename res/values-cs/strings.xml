@@ -42,6 +42,7 @@
 	<string name="import_csv">Importovat CSV</string>
 	<string name="export_csv">Exportovat CSV</string>
 	<string name="preference">Nastavení</string>
+	<string name="auto_merge">Automaticky sloučit</string>
 	<string name="erase_db">Smazat DB</string>
 	<string name="erase_database">Smazat databázi?</string>
 	<string name="are_you_sure_clean_whole_db">Opravdu chcete vymazat celou databázi?</string>

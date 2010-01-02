@@ -357,6 +357,12 @@ public class MainActivity extends Activity {
 			case R.id.menuPreference:
 				this.startActivity(new Intent(this, PreferenceActivity.class));
 				return true;
+			case R.id.menuAutoMerge:
+				db.autoMergeCwg();
+				listCursor.requery();
+				listAdapter.notifyDataSetInvalidated();
+				listAdapter.notifyDataSetChanged();
+				return true;
 			case R.id.menuEraseDb:
 				AlertDialog dialog = new AlertDialog.Builder(this).create();
 				dialog.setTitle(R.string.erase_database);

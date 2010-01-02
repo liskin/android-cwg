@@ -273,6 +273,33 @@ public class DatabaseAdapter {
 		endTransaction();
 	}
 
+	public void autoMergeCwg() {
+		beginTransaction();
+
+		while (true) {
+			Cursor mCursor =
+				db.query(false, "cwg c1, cwg c2", new String[]{
+					"c1._id, c2._id",},
+				"LOWER(c1.title) = LOWER(c2.catalog_title) AND c1.catalog_id IS NULL AND c2.catalog_id IS NOT NULL",
+				null,
+				null,
+				null,
+				"c2.count",
+				"1");
+			if (mCursor == null) {
+				endTransaction();
+				return;
+			}
+			if (mCursor.getCount() == 0) {
+				mCursor.close();
+				endTransaction();
+				return;
+			}
+			mCursor.moveToFirst();
+			mergeCwg(mCursor.getInt(0), mCursor.getInt(1));
+			mCursor.close();
+		}
+	}
 	public void eraseDb() {
 		db.delete("cwg", null, null);
 	}

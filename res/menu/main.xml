@@ -46,7 +46,10 @@
 	<item android:id="@+id/menuPreference"
 		android:title="@string/preference"
 		android:icon="@android:drawable/ic_menu_preferences" />
+	<item android:id="@+id/menuAutoMerge"
+		android:title="@string/auto_merge"
+		/>
 	<item android:id="@+id/menuEraseDb"
 		android:title="@string/erase_db"
-		android:icon="@android:drawable/ic_menu_delete" />
+		/>
 </menu>

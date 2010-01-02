@@ -46,6 +46,7 @@
 	<string name="import_csv">Import CSV</string>
 	<string name="export_csv">Export CSV</string>
 	<string name="preference">Preferences</string>
+	<string name="auto_merge">Auto-merge</string>
 	<string name="erase_db">Erase DB</string>
 	<string name="erase_database">Erase database?</string>
 	<string name="are_you_sure_clean_whole_db">Are you sure clean whole DB?</string>
