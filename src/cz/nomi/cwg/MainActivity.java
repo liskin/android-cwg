@@ -499,7 +499,11 @@ public class MainActivity extends Activity {
 				edit.setText(title);
 				cur.close();
 				AlertDialog alertDialog = new AlertDialog.Builder(this).create();
-				alertDialog.setTitle(catalogTitle);
+				if (catalogTitle == null) {
+					alertDialog.setTitle(title);
+				} else {
+					alertDialog.setTitle(catalogTitle);
+				}
 				alertDialog.setView(textEntryView);
 				alertDialog.setButton(getText(android.R.string.ok), new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int which) {
