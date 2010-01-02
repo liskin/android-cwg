@@ -26,12 +26,22 @@ import javax.xml.parsers.FactoryConfigurationError;
 import javax.xml.parsers.ParserConfigurationException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 public class CatalogImport extends Import {
 	private static final String TAG = "CwgCatalogImport";
 
 	public CatalogImport() {
+	}
+
+	private String nodeValue(Node node) {
+		StringBuilder text = new StringBuilder();
+		NodeList chars = node.getChildNodes();
+		for (int k=0 ; k<chars.getLength() ; k++){
+			text.append(chars.item(k).getNodeValue());
+		}
+		return text.toString();
 	}
 
 	public void importData(DatabaseAdapter db) throws IOException {
@@ -48,11 +58,11 @@ public class CatalogImport extends Import {
 					String jpg = null;
 					while (node2 != null) {
 						if (node2.getNodeName().equals("id_katalog")) {
-							idCatalog = node2.getFirstChild().getNodeValue();
+							idCatalog = nodeValue(node2);
 						} else if (node2.getNodeName().equals("jmeno")) {
-							catalogTitle = node2.getFirstChild().getNodeValue();
+							catalogTitle = nodeValue(node2);
 						} else if (node2.getNodeName().equals("jpg_oficialni")) {
-							jpg = node2.getFirstChild().getNodeValue();
+							jpg = nodeValue(node2);
 						}
 						node2 = node2.getNextSibling();
 					}
