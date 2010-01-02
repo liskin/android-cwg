@@ -65,9 +65,19 @@
             android:layout_column="1"
             android:text="@string/image"
             />
-		<ImageView
-			android:id="@+id/image"
-            android:gravity="right"
-			/>
+		<FrameLayout
+				android:gravity="right">
+			<ProgressBar
+				android:id="@+id/imageProgress"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				/>
+			<ImageView
+				android:id="@+id/image"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:visibility="gone"
+				/>
+		</FrameLayout>
     </TableRow>
 </TableLayout>

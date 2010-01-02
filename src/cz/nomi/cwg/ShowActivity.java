@@ -24,7 +24,9 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
+import android.view.View;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 import java.io.IOException;
@@ -57,6 +59,7 @@ public class ShowActivity extends Activity {
 		TextView showCatalogId = (TextView) findViewById(R.id.show_catalog_id);
 		TextView showCount = (TextView) findViewById(R.id.show_count);
 		final ImageView image = (ImageView) findViewById(R.id.image);
+		final ProgressBar imageProgress = (ProgressBar) findViewById(R.id.imageProgress);
 
 		showTitle.setText(cur.getString(cur.getColumnIndex("title")));
 		showCatalogTitle.setText(cur.getString(cur.getColumnIndex("catalog_title")));
@@ -81,7 +84,9 @@ public class ShowActivity extends Activity {
 							final Drawable d = Drawable.createFromStream(in, "src");
 							handler.post(new Runnable() {
 								public void run() {
+									imageProgress.setVisibility(View.GONE);
 									image.setImageDrawable(d);
+									image.setVisibility(View.VISIBLE);
 								}
 							});
 						} catch (final MalformedURLException mue) {
