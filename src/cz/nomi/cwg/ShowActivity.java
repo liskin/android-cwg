@@ -67,46 +67,48 @@ public class ShowActivity extends Activity {
 		showCount.setText(cur.getString(cur.getColumnIndex("count")));
 
 		// Image
-			SharedPreferences settings =
-					PreferenceManager.getDefaultSharedPreferences(getBaseContext());
-			final String imageUrl = settings.getString("image_url",
-					getText(R.string.pref_image_url).toString());
-			final String jpg = cur.getString(cur.getColumnIndex("jpg"));
-			cur.close();
-			if (jpg != null) {
-				final Handler handler = new Handler();
-				new Thread() {
-					@Override
-					public void run() {
-						try {
-							URL url = new URL(imageUrl + jpg);
-							InputStream in = url.openStream();
-							final Drawable d = Drawable.createFromStream(in, "src");
-							handler.post(new Runnable() {
-								public void run() {
-									imageProgress.setVisibility(View.GONE);
-									image.setImageDrawable(d);
-									image.setVisibility(View.VISIBLE);
-								}
-							});
-						} catch (final MalformedURLException mue) {
-							handler.post(new Runnable() {
-								public void run() {
-									Toast.makeText(ShowActivity.this, mue.getClass().getName() +
-										": " + mue.getMessage(), Toast.LENGTH_LONG).show();
-								}
-							});
-						} catch (final IOException ioe) {
-							handler.post(new Runnable() {
-								public void run() {
-									Toast.makeText(ShowActivity.this, ioe.getClass().getName() +
-										": " + ioe.getMessage(), Toast.LENGTH_LONG).show();
-								}
-							});
-						}
+		SharedPreferences settings =
+				PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+		final String imageUrl = settings.getString("image_url",
+				getText(R.string.pref_image_url).toString());
+		final String jpg = cur.getString(cur.getColumnIndex("jpg"));
+		cur.close();
+		if (jpg != null) {
+			final Handler handler = new Handler();
+			new Thread() {
+				@Override
+				public void run() {
+					try {
+						URL url = new URL(imageUrl + jpg);
+						InputStream in = url.openStream();
+						final Drawable d = Drawable.createFromStream(in, "src");
+						handler.post(new Runnable() {
+							public void run() {
+								imageProgress.setVisibility(View.GONE);
+								image.setImageDrawable(d);
+								image.setVisibility(View.VISIBLE);
+							}
+						});
+					} catch (final MalformedURLException mue) {
+						handler.post(new Runnable() {
+							public void run() {
+								imageProgress.setVisibility(View.GONE);
+								Toast.makeText(ShowActivity.this, mue.getClass().getName() +
+									": " + mue.getMessage(), Toast.LENGTH_LONG).show();
+							}
+						});
+					} catch (final IOException ioe) {
+						handler.post(new Runnable() {
+							public void run() {
+								imageProgress.setVisibility(View.GONE);
+								Toast.makeText(ShowActivity.this, ioe.getClass().getName() +
+									": " + ioe.getMessage(), Toast.LENGTH_LONG).show();
+							}
+						});
 					}
-				}.start();
-			}
+				}
+			}.start();
+		}
 	}
 
 	@Override
