@@ -22,6 +22,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
 class DatabaseHelper extends SQLiteOpenHelper {
+	private static final String TAG = "CwgDatabaseHelper";
 	private static final String DATABASE_NAME = "cwg";
 	private static final int DATABASE_VERSION = 2;
 
@@ -45,7 +46,7 @@ class DatabaseHelper extends SQLiteOpenHelper {
 
 	@Override
 	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-		Log.d(null, "Upgrading from " + oldVersion + " to " + newVersion);
+		Log.d(TAG, "Upgrading from " + oldVersion + " to " + newVersion);
 		if (oldVersion == 1) {
 			db.execSQL("ALTER TABLE cwg RENAME TO _cwg");
 			db.execSQL("CREATE TABLE cwg (_id INTEGER PRIMARY KEY,"

@@ -99,11 +99,15 @@ public class MainActivity extends Activity {
 		}
 	}
 
+	private enum Mode {
+		NORMAL, DUPLICITY, NO_CATALOG
+	}
 	private DatabaseAdapter db;
 	private boolean duplicity = false;
 	private SimpleCursorAdapter listAdapter;
 	private Cursor listCursor;
 	private long mergeId = 0;
+	private Mode mode = Mode.NORMAL;
 
 	@Override
 	public void onCreate(Bundle icicle) {
@@ -134,10 +138,16 @@ public class MainActivity extends Activity {
 				});
 		listAdapter.setFilterQueryProvider(new FilterQueryProvider() {
 			public Cursor runQuery(CharSequence arg0) {
-				if (MainActivity.this.duplicity) {
-					listCursor = db.getDuplicityFilteredCwg(arg0.toString());
-				} else {
-					listCursor = db.getFilteredCwg(arg0.toString());
+				switch (MainActivity.this.mode) {
+					case NORMAL:
+						listCursor = db.getFilteredCwg(arg0.toString());
+						break;
+					case DUPLICITY:
+						listCursor = db.getDuplicityFilteredCwg(arg0.toString());
+						break;
+					case NO_CATALOG:
+						listCursor = db.getWoCatalogFilteredCwg(arg0.toString());
+						break;
 				}
 				return listCursor;
 			}
@@ -302,19 +312,41 @@ public class MainActivity extends Activity {
 				}.start();
 	}
 
+	private void reloadMode() {
+		switch (this.mode) {
+			case NORMAL:
+				listCursor = db.getAllCwg();
+				break;
+			case DUPLICITY:
+				listCursor = db.getDuplicityCwg();
+				break;
+			case NO_CATALOG:
+				listCursor = db.getWoCatalogCwg();
+				break;
+		}
+		listAdapter.changeCursor(listCursor);
+		listAdapter.notifyDataSetInvalidated();
+		listAdapter.notifyDataSetChanged();
+	}
+
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 			case R.id.menuDuplicity:
-				this.duplicity = !this.duplicity;
-				if (this.duplicity) {
-					listCursor = db.getDuplicityCwg();
+				if (this.mode == Mode.DUPLICITY) {
+					this.mode = Mode.NORMAL;
 				} else {
-					listCursor = db.getAllCwg();
+					this.mode = Mode.DUPLICITY;
 				}
-				listAdapter.changeCursor(listCursor);
-				listAdapter.notifyDataSetInvalidated();
-				listAdapter.notifyDataSetChanged();
+				reloadMode();
+				return true;
+			case R.id.menuWoCatalog:
+				if (this.mode == Mode.NO_CATALOG) {
+					this.mode = Mode.NORMAL;
+				} else {
+					this.mode = Mode.NO_CATALOG;
+				}
+				reloadMode();
 				return true;
 			case R.id.menuExportText:
 				TextExport textExport = new TextExport();

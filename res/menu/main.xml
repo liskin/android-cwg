@@ -20,6 +20,9 @@
 	<item android:id="@+id/menuDuplicity"
 		android:title="@string/duplicity"
 		android:icon="@drawable/copy" />
+	<item android:id="@+id/menuWoCatalog"
+		android:title="@string/without_catalog"
+		android:icon="@drawable/tag" />
 	<item android:title="@string/import_"
 		android:icon="@drawable/down">
 		<menu>

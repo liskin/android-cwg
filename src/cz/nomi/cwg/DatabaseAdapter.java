@@ -23,8 +23,10 @@ import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
+import android.widget.Toast;
 
 public class DatabaseAdapter {
+	private static final String TAG = "CwgDatabaseAdapter";
 	private Context context;
 	private DatabaseHelper databaseHelper;
 	private SQLiteDatabase db;
@@ -132,6 +134,21 @@ public class DatabaseAdapter {
 				"title, catalog_id");
 	}
 
+	public Cursor getWoCatalogCwg() {
+		return db.query("cwg", new String[]{
+					"_id",
+					"title",
+					"catalog_title",
+					"catalog_id",
+					"jpg",
+					"count"},
+				"catalog_id IS NULL",
+				null,
+				null,
+				null,
+				"title, catalog_id");
+	}
+
 	public Cursor getFilteredCwg(String title) {
 		if (title == null || title.length() == 0) {
 			return this.getAllCwg();
@@ -161,6 +178,23 @@ public class DatabaseAdapter {
 					"jpg",
 					"count"},
 				"count > 1 AND title LIKE '%' || ? || '%'",
+				new String[]{
+					title
+				},
+				null,
+				null,
+				"title, catalog_id");
+	}
+
+	public Cursor getWoCatalogFilteredCwg(String title) {
+		return db.query("cwg", new String[]{
+					"_id",
+					"title",
+					"catalog_title",
+					"catalog_id",
+					"jpg",
+					"count"},
+				"catalog_id IS NULL AND title LIKE '%' || ? || '%'",
 				new String[]{
 					title
 				},
@@ -224,7 +258,8 @@ public class DatabaseAdapter {
 			// Update
 			db.execSQL("UPDATE cwg SET count = count - 1 WHERE _id = " + id);
 		} else {
-			Log.e(null, "Try to remove zero CWG");
+			Toast.makeText(context, context.getText(R.string.cant_remove_zero),
+				Toast.LENGTH_LONG).show();
 		}
 		mCursor.close();
 	}
@@ -260,7 +295,8 @@ public class DatabaseAdapter {
 				jpg = cur1.getString(cur2.getColumnIndex("jpg"));
 			} else {
 				endTransaction();
-				Log.e(null, "Both have catalog");
+				Toast.makeText(context, context.getText(R.string.cant_merge_both_have_catalog),
+						Toast.LENGTH_LONG).show();
 				return;
 			}
 		}
@@ -296,7 +332,6 @@ public class DatabaseAdapter {
 				return;
 			}
 			mCursor.moveToFirst();
-			Log.d(null, mCursor.getInt(0) + ":" + mCursor.getInt(1));
 			mergeCwg(mCursor.getInt(0), mCursor.getInt(1));
 			mCursor.close();
 		}
