@@ -42,7 +42,6 @@ public class ProgressInputStream extends BufferedInputStream {
 		dialog.setMessage(context.getText(R.string.please_wait));
 		dialog.setCancelable(false);
 		dialog.setMax((int) size);
-		Log.d(null, Integer.toString((int) size));
 		dialog.show();
 
 		handler = new Handler();

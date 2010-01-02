@@ -153,7 +153,7 @@ public class DatabaseAdapter {
 	}
 
 	public Cursor getDuplicityFilteredCwg(String title) {
-		return db.query("cwg, title", new String[]{
+		return db.query("cwg", new String[]{
 					"_id",
 					"title",
 					"catalog_title",
@@ -280,7 +280,7 @@ public class DatabaseAdapter {
 			Cursor mCursor =
 				db.query(false, "cwg c1, cwg c2", new String[]{
 					"c1._id, c2._id",},
-				"LOWER(c1.title) = LOWER(c2.catalog_title) AND c1.catalog_id IS NULL AND c2.catalog_id IS NOT NULL",
+				"c1.title = c2.catalog_title AND c1.catalog_id IS NULL AND c2.catalog_id IS NOT NULL",
 				null,
 				null,
 				null,
@@ -296,6 +296,7 @@ public class DatabaseAdapter {
 				return;
 			}
 			mCursor.moveToFirst();
+			Log.d(null, mCursor.getInt(0) + ":" + mCursor.getInt(1));
 			mergeCwg(mCursor.getInt(0), mCursor.getInt(1));
 			mCursor.close();
 		}

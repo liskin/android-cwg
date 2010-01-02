@@ -38,6 +38,9 @@ class DatabaseHelper extends SQLiteOpenHelper {
 				+ "jpg VARCHAR,"
 				+ "count INT NOT NULL)");
 		db.execSQL("CREATE UNIQUE INDEX cwg_catalog_id_uix ON cwg (catalog_id)");
+		db.execSQL("CREATE INDEX cwg_count_ix on cwg (count)");
+		db.execSQL("CREATE INDEX cwg_title_ix on cwg (title)");
+		db.execSQL("CREATE INDEX cwg_catalog_title_ix on cwg (catalog_title)");
 	}
 
 	@Override
@@ -52,6 +55,9 @@ class DatabaseHelper extends SQLiteOpenHelper {
 				+ "jpg VARCHAR,"
 				+ "count INT NOT NULL)");
 			db.execSQL("CREATE UNIQUE INDEX cwg_catalog_id_uix ON cwg (catalog_id)");
+			db.execSQL("CREATE INDEX cwg_count_ix on cwg (count)");
+			db.execSQL("CREATE INDEX cwg_title_ix on cwg (title)");
+			db.execSQL("CREATE INDEX cwg_catalog_title_ix on cwg (catalog_title)");
 			db.execSQL("INSERT INTO cwg (title, count) " +
 					"SELECT title, count FROM _cwg JOIN title ON (_cwg.title_id = title._id)");
 			db.execSQL("DROP TABLE _cwg");

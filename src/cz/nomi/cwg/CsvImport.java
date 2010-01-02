@@ -21,6 +21,7 @@ import android.util.Log;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.Vector;
 
 public class CsvImport extends Import {
 	private static final String TAG = "CwgCsvImport";
@@ -32,15 +33,12 @@ public class CsvImport extends Import {
 		BufferedReader reader = new BufferedReader(new InputStreamReader(getInput()));
 		String line;
 		while ((line = reader.readLine()) != null) {
-			String title = "";
-			String catalogTitle = "";
-			String catalogId = "";
-			String jpg = "";
-			String count = "";
 			int col = 0;
 			int length = line.length();
 			boolean quote = false;
 			boolean escape = false;
+			Vector<StringBuffer> columns = new Vector<StringBuffer>();
+			columns.add(new StringBuffer());
 			for (int pos = 0 ; pos < length ; pos++) {
 				if (line.charAt(pos) == '\\') {
 					escape = !escape;
@@ -54,46 +52,59 @@ public class CsvImport extends Import {
 				}
 				if (!escape && !quote && (line.charAt(pos) == ',' || line.charAt(pos) == ';')) {
 					col++;
+					columns.add(new StringBuffer());
 					continue;
 				}
-				switch (col) {
-					case 0:
-						title += line.charAt(pos);
-						break;
-					case 1:
-						catalogTitle += line.charAt(pos);
-						break;
-					case 2:
-						catalogId += line.charAt(pos);
-						break;
-					case 3:
-						jpg += line.charAt(pos);
-						break;
-					case 4:
-						count += line.charAt(pos);
-						break;
-				}
+				columns.get(col).append(line.charAt(pos));
 				escape = false;
 			}
 
-			try {
-				int countI = Integer.parseInt(count);
-				title = title.trim();
-				if (title.length() > 0) {
-					if (catalogTitle.length() == 0) {
-						catalogTitle = null;
+			switch (col) {
+				case 2:
+					// Version 0.1 + 0.2
+					String title = columns.get(0).toString().trim();
+					if (title.length() > 0) {
+						// Column 1 was version -> ignoring
+						String count = columns.get(2).toString().trim();
+						try {
+							int countI = Integer.parseInt(count);
+							db.addCwg(title, null, null, null, countI);
+						} catch (NumberFormatException nfe) {
+							Log.d(TAG, "Count is not number, skipping:" +
+								" count=" + count);
+						}
 					}
-					if (catalogId.length() == 0) {
-						catalogId = null;
+					break;
+				case 4:
+					// Version 0.3+
+					title = columns.get(0).toString().trim();
+					if (title.length() > 0) {
+						String catalogTitle = columns.get(1).toString().trim();
+						String catalogId = columns.get(2).toString().trim();
+						String jpg = columns.get(3).toString().trim();
+						String count = columns.get(4).toString().trim();
+
+						if (catalogTitle.length() == 0) {
+							catalogTitle = null;
+						}
+						if (catalogId.length() == 0) {
+							catalogId = null;
+						}
+						if (jpg.length() == 0) {
+							jpg = null;
+						}
+						try {
+							int	countI = Integer.parseInt(count);
+							db.addCwg(title, catalogTitle, catalogId, jpg, countI);
+						} catch (NumberFormatException nfe) {
+							Log.d(TAG, "Count is not number, skipping:" +
+								" count=" + count);
+						}
 					}
-					if (jpg.length() == 0) {
-						jpg = null;
-					}
-					db.addCwg(title, catalogTitle, catalogId, jpg, countI);
-				}
-			} catch (NumberFormatException nfe) {
-				Log.d(TAG, "Count is not number, skipping:" +
-						" count=" + count);
+					break;
+				default:
+					Log.e(TAG, "Unknown CSV version");
+					break;
 			}
 		}
 	}

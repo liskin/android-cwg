@@ -358,10 +358,30 @@ public class MainActivity extends Activity {
 				this.startActivity(new Intent(this, PreferenceActivity.class));
 				return true;
 			case R.id.menuAutoMerge:
-				db.autoMergeCwg();
-				listCursor.requery();
-				listAdapter.notifyDataSetInvalidated();
-				listAdapter.notifyDataSetChanged();
+				final ProgressDialog progress = new ProgressDialog(this);
+				progress.setIndeterminate(true);
+				progress.setCancelable(false);
+				progress.setMessage(getText(R.string.please_wait));
+				progress.setTitle(R.string.auto_merging);
+				progress.show();
+
+				final Handler handler = new Handler();
+				new Thread() {
+					@Override
+					public void run() {
+						db.autoMergeCwg();
+
+						handler.post(new Runnable() {
+							public void run() {
+								listCursor.requery();
+								listAdapter.notifyDataSetInvalidated();
+								listAdapter.notifyDataSetChanged();
+								progress.dismiss();
+							}
+						});
+					}
+				}.start();
+
 				return true;
 			case R.id.menuEraseDb:
 				AlertDialog dialog = new AlertDialog.Builder(this).create();
