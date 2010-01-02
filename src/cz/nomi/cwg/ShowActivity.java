@@ -22,6 +22,7 @@ import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -55,7 +56,7 @@ public class ShowActivity extends Activity {
 		TextView showCatalogTitle = (TextView) findViewById(R.id.show_catalog_title);
 		TextView showCatalogId = (TextView) findViewById(R.id.show_catalog_id);
 		TextView showCount = (TextView) findViewById(R.id.show_count);
-		ImageView image = (ImageView) findViewById(R.id.image);
+		final ImageView image = (ImageView) findViewById(R.id.image);
 
 		showTitle.setText(cur.getString(cur.getColumnIndex("title")));
 		showCatalogTitle.setText(cur.getString(cur.getColumnIndex("catalog_title")));
@@ -63,27 +64,44 @@ public class ShowActivity extends Activity {
 		showCount.setText(cur.getString(cur.getColumnIndex("count")));
 
 		// Image
-		try {
 			SharedPreferences settings =
 					PreferenceManager.getDefaultSharedPreferences(getBaseContext());
-			String imageUrl = settings.getString("image_url",
+			final String imageUrl = settings.getString("image_url",
 					getText(R.string.pref_image_url).toString());
-
-			String jpg = cur.getString(cur.getColumnIndex("jpg"));
+			final String jpg = cur.getString(cur.getColumnIndex("jpg"));
+			cur.close();
 			if (jpg != null) {
-				URL url = new URL(imageUrl + jpg);
-				InputStream in = url.openStream();
-				Drawable d = Drawable.createFromStream(in, "src");
-				image.setImageDrawable(d);
+				final Handler handler = new Handler();
+				new Thread() {
+					@Override
+					public void run() {
+						try {
+							URL url = new URL(imageUrl + jpg);
+							InputStream in = url.openStream();
+							final Drawable d = Drawable.createFromStream(in, "src");
+							handler.post(new Runnable() {
+								public void run() {
+									image.setImageDrawable(d);
+								}
+							});
+						} catch (final MalformedURLException mue) {
+							handler.post(new Runnable() {
+								public void run() {
+									Toast.makeText(ShowActivity.this, mue.getClass().getName() +
+										": " + mue.getMessage(), Toast.LENGTH_LONG).show();
+								}
+							});
+						} catch (final IOException ioe) {
+							handler.post(new Runnable() {
+								public void run() {
+									Toast.makeText(ShowActivity.this, ioe.getClass().getName() +
+										": " + ioe.getMessage(), Toast.LENGTH_LONG).show();
+								}
+							});
+						}
+					}
+				}.start();
 			}
-		} catch (MalformedURLException mue) {
-			Toast.makeText(this, mue.getClass().getName() + ": " + mue.getMessage(),
-					Toast.LENGTH_LONG).show();
-		} catch (IOException ioe) {
-			Toast.makeText(this, ioe.getClass().getName() + ": " + ioe.getMessage(),
-					Toast.LENGTH_LONG).show();
-		}
-		cur.close();
 	}
 
 	@Override
