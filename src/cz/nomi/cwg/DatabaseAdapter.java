@@ -408,4 +408,27 @@ public class DatabaseAdapter {
 		mCursor.close();
 		return count;
 	}
+
+	public int countCwgCatalog() {
+		Cursor mCursor =
+				db.query(false, "cwg", new String[]{
+					"COUNT(*)"},
+				"catalog_id IS NOT NULL",
+				null,
+				null,
+				null,
+				null,
+				null);
+		if (mCursor == null) {
+			return 0;
+		}
+		if (mCursor.getCount() == 0) {
+			mCursor.close();
+			return 0;
+		}
+		mCursor.moveToFirst();
+		int count = mCursor.getInt(0);
+		mCursor.close();
+		return count;
+	}
 }

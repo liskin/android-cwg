@@ -56,6 +56,7 @@
 	<string name="cwg_count">CWG count:</string>
 	<string name="unique_cwg">Unique CWG:</string>
 	<string name="duplicate_cwg">Duplicate CWG:</string>
+	<string name="catalog_cwg">CWG in catalog:</string>
 	<string name="importing">Importing</string>
 	<string name="exporting">Exporting</string>
 	<string name="please_wait">Please wait...</string>

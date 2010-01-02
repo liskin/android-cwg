@@ -51,4 +51,14 @@
             android:gravity="right"
             />
     </TableRow>
+    <TableRow>
+        <TextView
+            android:layout_column="1"
+            android:text="@string/catalog_cwg"
+            />
+        <TextView
+			android:id="@+id/stats_cwg_catalog"
+            android:gravity="right"
+            />
+    </TableRow>
 </TableLayout>

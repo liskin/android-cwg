@@ -36,10 +36,12 @@ public class StatsActivity extends Activity {
 		TextView cwgCount = (TextView) findViewById(R.id.stats_cwg_count);
 		TextView cwgUnique = (TextView) findViewById(R.id.stats_cwg_unique);
 		TextView cwgDuplicity = (TextView) findViewById(R.id.stats_cwg_duplicity);
+		TextView cwgCatalog = (TextView) findViewById(R.id.stats_cwg_catalog);
 
 		cwgCount.setText(Integer.toString(db.countCwgSumCount()));
 		cwgUnique.setText(Integer.toString(db.countCwg()));
 		cwgDuplicity.setText(Integer.toString(db.countCwgDuplicity()));
+		cwgCatalog.setText(Integer.toString(db.countCwgCatalog()));
 	}
 
 	@Override

@@ -52,6 +52,7 @@
 	<string name="cwg_count">Počet CWG:</string>
 	<string name="unique_cwg">Unikátních CWG:</string>
 	<string name="duplicate_cwg">Duplicitních CWG:</string>
+	<string name="catalog_cwg">CWG v katalogu:</string>
 	<string name="importing">Importuji</string>
 	<string name="exporting">Exportuji</string>
 	<string name="please_wait">Prosím čekejte...</string>
