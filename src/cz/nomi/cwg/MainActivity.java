@@ -29,7 +29,6 @@ import android.database.sqlite.SQLiteConstraintException;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.text.ClipboardManager;
@@ -338,6 +337,17 @@ public class MainActivity extends Activity {
 						public void run() {
 							Toast.makeText(MainActivity.this, ioe.getClass().getName() +
 								": " + ioe.getMessage(), Toast.LENGTH_LONG).show();
+						}
+					});
+				}
+
+				try {
+					output.close();
+				} catch (final IOException ioe) {
+					handler.post(new Runnable() {
+						public void run() {
+							Toast.makeText(MainActivity.this, ioe.getClass().getName() +
+								": " + ioe.getMessage(),	Toast.LENGTH_LONG).show();
 						}
 					});
 				}
