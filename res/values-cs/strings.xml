@@ -64,6 +64,8 @@
 	<string name="cant_merge_both_have_catalog">Nemohu sloučit tyto CWG - obě mají katalog ID</string>
 	<string name="cant_remove_zero">Není možné odebrat CWG s nulovým počtem</string>
 	<string name="cant_import_duplicity">Není možné importovat duplicitní CWG</string>
+	<string name="cant_open_external_storage">Nemohu otevřít disk</string>
+	<string name="cant_open_file">Nemohu otevřít soubor:</string>
 	<string name="catalog_url">URL katalogu</string>
 	<string name="image_url">URL obrázků</string>
 </resources>

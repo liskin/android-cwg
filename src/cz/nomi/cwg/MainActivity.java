@@ -224,38 +224,46 @@ public class MainActivity extends Activity {
 	}
 
 	private OutputStream newFileOutput(String fileName) {
-		File root = Environment.getExternalStorageDirectory();
-		if (root.canRead()) {
-			File file = new File(root, fileName);
+		File file = Storage.getFile(fileName);
+		if (file == null) {
+			Toast.makeText(MainActivity.this, getText(R.string.cant_open_external_storage),
+					Toast.LENGTH_LONG).show();
+			return null;
+		} else {
 			try {
-				OutputStream out = new FileOutputStream(file);
-				return out;
+				return new FileOutputStream(file);
 			} catch (FileNotFoundException fnfe) {
+				Toast.makeText(MainActivity.this, getText(R.string.cant_open_file) +
+					" " + fnfe.getMessage(), Toast.LENGTH_LONG).show();
 				return null;
 			}
-		} else {
-			return null;
 		}
 	}
 
 	private ProgressInputStream newFileInput(String fileName) {
-		File root = Environment.getExternalStorageDirectory();
-		if (root.canWrite()) {
-			File file = new File(root, fileName);
+		File file = Storage.getFile(fileName);
+		if (file == null) {
+			Toast.makeText(MainActivity.this, getText(R.string.cant_open_external_storage),
+					Toast.LENGTH_LONG).show();
+			return null;
+		} else {
 			try {
 				return new ProgressInputStream(
 						this,
 						new FileInputStream(file),
 						file.length());
 			} catch (FileNotFoundException fnfe) {
+				Toast.makeText(MainActivity.this, getText(R.string.cant_open_file) +
+					" " + fnfe.getMessage(), Toast.LENGTH_LONG).show();
 				return null;
 			}
-		} else {
-			return null;
 		}
 	}
 
 	private void doImport(final Import importer, final ProgressInputStream input) {
+		if (input == null) {
+			return;
+		}
 		final Handler handler = new Handler();
 		new Thread() {
 			@Override
@@ -265,7 +273,9 @@ public class MainActivity extends Activity {
 				
 				try {
 					importer.importData(db);
+					db.endTransaction();
 				} catch (final SQLiteConstraintException se) {
+					db.rollback();
 					handler.post(new Runnable() {
 						public void run() {
 							Toast.makeText(MainActivity.this,
@@ -274,6 +284,7 @@ public class MainActivity extends Activity {
 						}
 					});
 				} catch (final IOException ioe) {
+					db.rollback();
 					handler.post(new Runnable() {
 						public void run() {
 							Toast.makeText(MainActivity.this, ioe.getClass().getName() +
@@ -281,8 +292,6 @@ public class MainActivity extends Activity {
 						}
 					});
 				}
-
-				db.endTransaction();
 
 				try {
 					input.close();
@@ -307,39 +316,42 @@ public class MainActivity extends Activity {
 	}
 
 	private void doExport(final Export exporter, final OutputStream output) {
-				final ProgressDialog progress = new ProgressDialog(this);
-				progress.setIndeterminate(true);
-				progress.setCancelable(false);
-				progress.setMessage(getText(R.string.please_wait));
-				progress.setTitle(R.string.exporting);
-				progress.show();
+		if (output == null) {
+			return;
+		}
+		final ProgressDialog progress = new ProgressDialog(this);
+		progress.setIndeterminate(true);
+		progress.setCancelable(false);
+		progress.setMessage(getText(R.string.please_wait));
+		progress.setTitle(R.string.exporting);
+		progress.show();
 
-				final Handler handler = new Handler();
-				new Thread() {
-					@Override
-					public void run() {
-						try {
-							exporter.setOutput(output);
-							exporter.exportData(db.getAllCwg());
-						} catch (final IOException ioe) {
-							handler.post(new Runnable() {
-								public void run() {
-									Toast.makeText(MainActivity.this, ioe.getClass().getName() +
-										": " + ioe.getMessage(), Toast.LENGTH_LONG).show();
-								}
-							});
+		final Handler handler = new Handler();
+		new Thread() {
+			@Override
+			public void run() {
+				try {
+					exporter.setOutput(output);
+					exporter.exportData(db.getAllCwg());
+				} catch (final IOException ioe) {
+					handler.post(new Runnable() {
+						public void run() {
+							Toast.makeText(MainActivity.this, ioe.getClass().getName() +
+								": " + ioe.getMessage(), Toast.LENGTH_LONG).show();
 						}
+					});
+				}
 
-						handler.post(new Runnable() {
-							public void run() {
-								listCursor.requery();
-								listAdapter.notifyDataSetInvalidated();
-								listAdapter.notifyDataSetChanged();
-								progress.dismiss();
-							}
-						});
+				handler.post(new Runnable() {
+					public void run() {
+						listCursor.requery();
+						listAdapter.notifyDataSetInvalidated();
+						listAdapter.notifyDataSetChanged();
+						progress.dismiss();
 					}
-				}.start();
+				});
+			}
+		}.start();
 	}
 
 	private void reloadMode() {

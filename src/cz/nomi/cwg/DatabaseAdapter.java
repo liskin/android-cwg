@@ -47,6 +47,10 @@ class DatabaseAdapter {
 		db.beginTransaction();
 	}
 
+	void rollback() {
+		db.endTransaction();
+	}
+
 	void endTransaction() {
 		db.setTransactionSuccessful();
 		db.endTransaction();

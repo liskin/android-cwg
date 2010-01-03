@@ -66,8 +66,7 @@ public class ShowActivity extends Activity {
 						PreferenceManager.getDefaultSharedPreferences(getBaseContext());
 					final String imageUrl = settings.getString("image_url",
 						getText(R.string.pref_image_url).toString());
-					Storage storage = new Storage(ShowActivity.this);
-					File cache = storage.getJpgCacheFile(jpg);
+					File cache = Storage.getJpgCacheFile(jpg);
 					InputStream in;
 					URL url = new URL(imageUrl + jpg);
 					if (cache == null) {

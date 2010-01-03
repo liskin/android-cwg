@@ -17,7 +17,6 @@
 
 package cz.nomi.cwg;
 
-import android.content.Context;
 import android.os.Environment;
 import android.util.Log;
 import java.io.File;
@@ -26,28 +25,30 @@ class Storage {
 	private static final String TAG = "CwgStorage";
 	private static final String DIRECTORY = "cwg";
 	private static final String JPG_CACHE = "cache";
-	private Context context;
 
-	Storage(Context context) {
-		this.context = context;
-	}
-
-	File getJpgCacheFile(String name) {
+	static File getFile(String name) {
 		File root = Environment.getExternalStorageDirectory();
 		if (root.canWrite()) {
 			File file = new File(root, DIRECTORY);
 			if (!file.exists()) {
 				file.mkdir();
 			}
-			file = new File(file, JPG_CACHE);
-			if (!file.exists()) {
-				file.mkdir();
-			}
-
 			return new File(file, name);
 		} else {
 			Log.d(TAG, "Can't write to external storage");
 			return null;
+		}
+	}
+
+	static File getJpgCacheFile(String name) {
+		File root = getFile(JPG_CACHE);
+		if (root == null) {
+			return null;
+		} else {
+			if (!root.exists()) {
+				root.mkdir();
+			}
+			return new File(root, name);
 		}
 	}
 }
