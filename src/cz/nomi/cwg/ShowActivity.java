@@ -18,6 +18,8 @@
 package cz.nomi.cwg;
 
 import android.app.Activity;
+import android.content.DialogInterface;
+import android.view.View.OnClickListener;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.drawable.Drawable;
@@ -29,13 +31,93 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 
 public class ShowActivity extends Activity {
 	private DatabaseAdapter db;
+	private String jpg;
+	private ImageView image;
+	private ProgressBar imageProgress;
+
+	private void showImage(final boolean forceDownload) {
+		final Handler handler = new Handler();
+		image.setVisibility(View.GONE);
+		if (jpg == null) {
+			imageProgress.setVisibility(View.GONE);
+			return;
+		} else {
+			imageProgress.setVisibility(View.VISIBLE);
+		}
+
+		new Thread() {
+			@Override
+			public void run() {
+				try {
+					SharedPreferences settings =
+						PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+					final String imageUrl = settings.getString("image_url",
+						getText(R.string.pref_image_url).toString());
+					File cache = Storage.getJpgCacheFile(jpg);
+					InputStream in;
+					URL url = new URL(imageUrl + jpg);
+					if (cache == null) {
+						// Can't cache
+						in = url.openStream();
+					} else {
+						if (forceDownload || !cache.exists()) {
+							// Write to cache
+							in = url.openStream();
+							OutputStream outCache =
+								new BufferedOutputStream(new FileOutputStream(cache));
+							byte[] buf = new byte[1024];
+							int len;
+							while ((len = in.read(buf)) > 0) {
+								outCache.write(buf, 0, len);
+							}
+							in.close();
+							outCache.close();
+						}
+						// Load from cache
+						in = new BufferedInputStream(new FileInputStream(cache));
+					}
+
+					final Drawable d = Drawable.createFromStream(in, "src");
+					handler.post(new Runnable() {
+						public void run() {
+							imageProgress.setVisibility(View.GONE);
+							image.setImageDrawable(d);
+							image.setVisibility(View.VISIBLE);
+						}
+					});
+				} catch (final MalformedURLException mue) {
+					handler.post(new Runnable() {
+						public void run() {
+							imageProgress.setVisibility(View.GONE);
+							Toast.makeText(ShowActivity.this, mue.getClass().getName() +
+								": " + mue.getMessage(), Toast.LENGTH_LONG).show();
+						}
+					});
+				} catch (final IOException ioe) {
+					handler.post(new Runnable() {
+						public void run() {
+							imageProgress.setVisibility(View.GONE);
+							Toast.makeText(ShowActivity.this, ioe.getClass().getName() +
+								": " + ioe.getMessage(), Toast.LENGTH_LONG).show();
+						}
+					});
+				}
+			}
+		}.start();
+	}
 
 	@Override
     public void onCreate(Bundle icicle) {
@@ -58,59 +140,23 @@ public class ShowActivity extends Activity {
 		TextView showCatalogTitle = (TextView) findViewById(R.id.show_catalog_title);
 		TextView showCatalogId = (TextView) findViewById(R.id.show_catalog_id);
 		TextView showCount = (TextView) findViewById(R.id.show_count);
-		final ImageView image = (ImageView) findViewById(R.id.image);
-		final ProgressBar imageProgress = (ProgressBar) findViewById(R.id.imageProgress);
+		this.image = (ImageView) findViewById(R.id.image);
+		this.imageProgress = (ProgressBar) findViewById(R.id.imageProgress);
 
 		showTitle.setText(cur.getString(cur.getColumnIndex("title")));
 		showCatalogTitle.setText(cur.getString(cur.getColumnIndex("catalog_title")));
 		showCatalogId.setText(cur.getString(cur.getColumnIndex("catalog_id")));
 		showCount.setText(cur.getString(cur.getColumnIndex("count")));
+		this.jpg = cur.getString(cur.getColumnIndex("jpg"));
 
-		// Image
-		SharedPreferences settings =
-				PreferenceManager.getDefaultSharedPreferences(getBaseContext());
-		final String imageUrl = settings.getString("image_url",
-				getText(R.string.pref_image_url).toString());
-		final String jpg = cur.getString(cur.getColumnIndex("jpg"));
 		cur.close();
-		if (jpg != null) {
-			final Handler handler = new Handler();
-			new Thread() {
-				@Override
-				public void run() {
-					try {
-						URL url = new URL(imageUrl + jpg);
-						InputStream in = url.openStream();
-						final Drawable d = Drawable.createFromStream(in, "src");
-						handler.post(new Runnable() {
-							public void run() {
-								imageProgress.setVisibility(View.GONE);
-								image.setImageDrawable(d);
-								image.setVisibility(View.VISIBLE);
-							}
-						});
-					} catch (final MalformedURLException mue) {
-						handler.post(new Runnable() {
-							public void run() {
-								imageProgress.setVisibility(View.GONE);
-								Toast.makeText(ShowActivity.this, mue.getClass().getName() +
-									": " + mue.getMessage(), Toast.LENGTH_LONG).show();
-							}
-						});
-					} catch (final IOException ioe) {
-						handler.post(new Runnable() {
-							public void run() {
-								imageProgress.setVisibility(View.GONE);
-								Toast.makeText(ShowActivity.this, ioe.getClass().getName() +
-									": " + ioe.getMessage(), Toast.LENGTH_LONG).show();
-							}
-						});
-					}
-				}
-			}.start();
-		} else {
-			imageProgress.setVisibility(View.GONE);
-		}
+
+		this.image.setOnClickListener(new OnClickListener() {
+			public void onClick(View arg0) {
+				showImage(true);
+			}
+		});
+		showImage(false);
 	}
 
 	@Override

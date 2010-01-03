@@ -20,7 +20,7 @@ package cz.nomi.cwg;
 import android.os.Bundle;
 
 public class PreferenceActivity extends android.preference.PreferenceActivity {
-	DatabaseAdapter db;
+	private DatabaseAdapter db;
 
 	@Override
     public void onCreate(Bundle icicle) {

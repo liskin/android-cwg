@@ -20,13 +20,11 @@ package cz.nomi.cwg;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.Handler;
-import android.util.Log;
-import android.widget.Toast;
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-public class ProgressInputStream extends BufferedInputStream {
+class ProgressInputStream extends BufferedInputStream {
 	private long readed = 0;
 	private Context context;
 	private ProgressDialog dialog;
