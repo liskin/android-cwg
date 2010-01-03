@@ -64,7 +64,7 @@ import java.net.URL;
 
 public class MainActivity extends Activity {
 	class CustomViewBinder implements SimpleCursorAdapter.ViewBinder {
-		ColorStateList oldColors = null;
+		private ColorStateList oldColors = null;
 
 		public CustomViewBinder() {
 		}

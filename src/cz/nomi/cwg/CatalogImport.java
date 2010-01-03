@@ -29,10 +29,10 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-public class CatalogImport extends Import {
+class CatalogImport extends Import {
 	private static final String TAG = "CwgCatalogImport";
 
-	public CatalogImport() {
+	CatalogImport() {
 	}
 
 	private String nodeValue(Node node) {
@@ -44,7 +44,7 @@ public class CatalogImport extends Import {
 		return text.toString();
 	}
 
-	public void importData(DatabaseAdapter db) throws IOException {
+	void importData(DatabaseAdapter db) throws IOException {
 		try {
 			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 			DocumentBuilder builder = factory.newDocumentBuilder();

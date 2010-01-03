@@ -22,38 +22,37 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
-import android.util.Log;
 import android.widget.Toast;
 
-public class DatabaseAdapter {
+class DatabaseAdapter {
 	private static final String TAG = "CwgDatabaseAdapter";
 	private Context context;
 	private DatabaseHelper databaseHelper;
 	private SQLiteDatabase db;
 
-	public DatabaseAdapter(Context context) {
+	DatabaseAdapter(Context context) {
 		this.context = context;
 		this.databaseHelper = new DatabaseHelper(context);
 	}
 
-	public void open() throws SQLException {
+	void open() throws SQLException {
 		db = databaseHelper.getWritableDatabase();
 	}
 
-	public void close() {
+	void close() {
 		databaseHelper.close();
 	}
 
-	public void beginTransaction() {
+	void beginTransaction() {
 		db.beginTransaction();
 	}
 
-	public void endTransaction() {
+	void endTransaction() {
 		db.setTransactionSuccessful();
 		db.endTransaction();
 	}
 
-	public Cursor getCwg(long id) {
+	Cursor getCwg(long id) {
 		Cursor cursor =
 			db.query("cwg", new String[]{
 					"_id",
@@ -76,7 +75,7 @@ public class DatabaseAdapter {
 		}
 	}
 
-	public Cursor getCwgByCatalogId(String catalogId) {
+	Cursor getCwgByCatalogId(String catalogId) {
 		Cursor cursor =
 			db.query("cwg", new String[]{
 					"_id",
@@ -104,7 +103,7 @@ public class DatabaseAdapter {
 		}
 	}
 
-	public Cursor getAllCwg() {
+	Cursor getAllCwg() {
 		return db.query("cwg", new String[]{
 					"_id",
 					"title",
@@ -119,7 +118,7 @@ public class DatabaseAdapter {
 				"title, catalog_id");
 	}
 
-	public Cursor getDuplicityCwg() {
+	Cursor getDuplicityCwg() {
 		return db.query("cwg", new String[]{
 					"_id",
 					"title",
@@ -134,7 +133,7 @@ public class DatabaseAdapter {
 				"title, catalog_id");
 	}
 
-	public Cursor getWoCatalogCwg() {
+	Cursor getWoCatalogCwg() {
 		return db.query("cwg", new String[]{
 					"_id",
 					"title",
@@ -149,7 +148,7 @@ public class DatabaseAdapter {
 				"title, catalog_id");
 	}
 
-	public Cursor getFilteredCwg(String title) {
+	Cursor getFilteredCwg(String title) {
 		if (title == null || title.length() == 0) {
 			return this.getAllCwg();
 		}
@@ -169,7 +168,7 @@ public class DatabaseAdapter {
 				"count > 0 DESC, title, catalog_id");
 	}
 
-	public Cursor getDuplicityFilteredCwg(String title) {
+	Cursor getDuplicityFilteredCwg(String title) {
 		return db.query("cwg", new String[]{
 					"_id",
 					"title",
@@ -186,7 +185,7 @@ public class DatabaseAdapter {
 				"title, catalog_id");
 	}
 
-	public Cursor getWoCatalogFilteredCwg(String title) {
+	Cursor getWoCatalogFilteredCwg(String title) {
 		return db.query("cwg", new String[]{
 					"_id",
 					"title",
@@ -203,7 +202,7 @@ public class DatabaseAdapter {
 				"title, catalog_id");
 	}
 
-	public void addCwg(String title, String catalogTitle, String catalogId, String jpg, int count) {
+	void addCwg(String title, String catalogTitle, String catalogId, String jpg, int count) {
 		ContentValues val = new ContentValues();
 		val.put("title", title);
 		val.put("catalog_title", catalogTitle);
@@ -215,13 +214,13 @@ public class DatabaseAdapter {
 		return;
 	}
 
-	public void deleteCwg(long id) {
+	void deleteCwg(long id) {
 		db.delete("cwg", "_id = " + id, null);
 
 		return;
 	}
 
-	public void updateCwg(long id, String title, String catalogTitle,
+	void updateCwg(long id, String title, String catalogTitle,
 			String catalogId, String jpg, int count) {
 		ContentValues val = new ContentValues();
 		val.put("title", title);
@@ -232,11 +231,11 @@ public class DatabaseAdapter {
 		db.update("cwg", val, "_id = " + id, null);
 	}
 
-	public void incCwg(long id) {
+	void incCwg(long id) {
 		db.execSQL("UPDATE cwg SET count = count + 1 WHERE _id = " + id);
 	}
 
-	public void decCwg(long id) {
+	void decCwg(long id) {
 		Cursor mCursor =
 				db.query(true, "cwg", new String[]{
 					"count",},
@@ -264,7 +263,7 @@ public class DatabaseAdapter {
 		mCursor.close();
 	}
 
-	public void mergeCwg(long id1, long id2) {
+	void mergeCwg(long id1, long id2) {
 		if (id1 == id2) {
 			return;
 		}
@@ -309,7 +308,7 @@ public class DatabaseAdapter {
 		endTransaction();
 	}
 
-	public void autoMergeCwg() {
+	void autoMergeCwg() {
 		beginTransaction();
 
 		while (true) {
@@ -336,11 +335,12 @@ public class DatabaseAdapter {
 			mCursor.close();
 		}
 	}
-	public void eraseDb() {
+
+	void eraseDb() {
 		db.delete("cwg", null, null);
 	}
 
-	public int countCwgSumCount() {
+	int countCwgSumCount() {
 		Cursor mCursor =
 				db.query(false, "cwg", new String[]{
 					"SUM(count)",},
@@ -363,7 +363,7 @@ public class DatabaseAdapter {
 		return count;
 	}
 
-	public int countCwg() {
+	int countCwg() {
 		Cursor mCursor =
 				db.query(false, "cwg", new String[]{
 					"COUNT(*)"},
@@ -386,7 +386,7 @@ public class DatabaseAdapter {
 		return count;
 	}
 
-	public int countCwgDuplicity() {
+	int countCwgDuplicity() {
 		Cursor mCursor =
 				db.query(false, "cwg", new String[]{
 					"COUNT(*)"},
@@ -409,7 +409,7 @@ public class DatabaseAdapter {
 		return count;
 	}
 
-	public int countCwgCatalog() {
+	int countCwgCatalog() {
 		Cursor mCursor =
 				db.query(false, "cwg", new String[]{
 					"COUNT(*)"},

@@ -21,19 +21,19 @@ import android.database.Cursor;
 import java.io.IOException;
 import java.io.OutputStream;
 
-public abstract class Export {
+abstract class Export {
 	private OutputStream output;
 
-	public Export() {
+	Export() {
 	}
 
-	public void setOutput(OutputStream output) {
+	void setOutput(OutputStream output) {
 		this.output = output;
 	}
 
-	protected OutputStream getOutput() {
+	OutputStream getOutput() {
 		return this.output;
 	}
 
-	public abstract void exportData(Cursor cursor) throws IOException;
+	abstract void exportData(Cursor cursor) throws IOException;
 }

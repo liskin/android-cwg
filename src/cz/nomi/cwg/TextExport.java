@@ -20,11 +20,12 @@ package cz.nomi.cwg;
 import android.database.Cursor;
 import java.io.IOException;
 
-public class TextExport extends Export {
-	public TextExport() {
+class TextExport extends Export {
+	TextExport() {
 	}
 
-	public void exportData(Cursor cursor) throws IOException {
+	@Override
+	void exportData(Cursor cursor) throws IOException {
 		while (cursor.moveToNext()) {
 			getOutput().write(
 					(cursor.getString(cursor.getColumnIndex("title")) +

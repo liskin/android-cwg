@@ -23,13 +23,13 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Vector;
 
-public class CsvImport extends Import {
+class CsvImport extends Import {
 	private static final String TAG = "CwgCsvImport";
 
-	public CsvImport() {
+	CsvImport() {
 	}
 
-	public void importData(DatabaseAdapter db) throws IOException {
+	void importData(DatabaseAdapter db) throws IOException {
 		BufferedReader reader = new BufferedReader(new InputStreamReader(getInput()));
 		String line;
 		while ((line = reader.readLine()) != null) {

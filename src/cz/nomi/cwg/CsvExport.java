@@ -20,11 +20,11 @@ package cz.nomi.cwg;
 import android.database.Cursor;
 import java.io.IOException;
 
-public class CsvExport extends Export {
-	public CsvExport() {
+class CsvExport extends Export {
+	CsvExport() {
 	}
 
-	public void exportData(Cursor cursor) throws IOException {
+	void exportData(Cursor cursor) throws IOException {
 		getOutput().write("\"Title\";\"Catalog title\";\"Catalog ID\";\"JPG\";\"Count\"\n".getBytes("UTF-8"));
 		while (cursor.moveToNext()) {
 			StringBuffer buffer = new StringBuffer();

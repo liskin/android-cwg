@@ -20,19 +20,19 @@ package cz.nomi.cwg;
 import java.io.IOException;
 import java.io.InputStream;
 
-public abstract class Import {
+abstract class Import {
 	private InputStream input;
 
-	public Import() {
+	Import() {
 	}
 
-	public void setInput(InputStream input) {
+	void setInput(InputStream input) {
 		this.input = input;
 	}
 
-	protected InputStream getInput() {
+	InputStream getInput() {
 		return this.input;
 	}
 
-	public abstract void importData(DatabaseAdapter db) throws IOException;
+	abstract void importData(DatabaseAdapter db) throws IOException;
 }

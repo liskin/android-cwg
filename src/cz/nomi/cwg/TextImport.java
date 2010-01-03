@@ -21,11 +21,12 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
-public class TextImport extends Import {
-	public TextImport() {
+class TextImport extends Import {
+	TextImport() {
 	}
 
-	public void importData(DatabaseAdapter db) throws IOException {
+	@Override
+	void importData(DatabaseAdapter db) throws IOException {
 		BufferedReader reader = new BufferedReader(new InputStreamReader(getInput()));
 		String line;
 		while ((line = reader.readLine()) != null) {
