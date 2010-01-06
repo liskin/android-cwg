@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+	This file is part of Android-CWG.
+
+	Android-CWG is free software: you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation, either version 3 of the License, or
+	(at your option) any later version.
+
+	Android-CWG is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+
+	You should have received a copy of the GNU General Public License
+	along with Android-CWG.  If not, see <http://www.gnu.org/licenses/>.
+-->
+
+<resources>
+	<string name="app_name">Czech Wood Geocoin</string>
+	<string name="main_activity">CWG</string>
+	<string name="preference_activity">CWG - Nastavenia</string>
+	<string name="statistics_activity">CWG - Štatistiky</string>
+	<string name="show_activity">CWG - Detail</string>
+
+	<string name="show">Zobraziť</string>
+	<string name="add_same">Pridať rovnaké</string>
+	<string name="add_other_version">Pridať inú verziu</string>
+	<string name="rename">Premenovať</string>
+	<string name="copy">Kopírovať</string>
+	<string name="delete">Zmazať</string>
+	<string name="delete_cwg">Zmazať CWG?</string>
+	<string name="are_you_sure_delete_cwg">Naozaj chcete zmazať toto CWG?</string>
+	<string name="remove_one">Odobrať jedno</string>
+	<string name="merge">Zlúčit</string>
+	<string name="duplicity">Duplicity</string>
+	<string name="without_catalog">Bez katalógu</string>
+	<string name="import_">Import</string>
+	<string name="export">Export</string>
+	<string name="import_catalog">Importovať katalóg</string>
+	<string name="import_text">Importovať text</string>
+	<string name="export_text">Exportovať text</string>
+	<string name="import_csv">Importovať CSV</string>
+	<string name="export_csv">Exportovať CSV</string>
+	<string name="preference">Nastavenia</string>
+	<string name="auto_merge">Automaticky zlúčiť</string>
+	<string name="auto_merging">Automaticky zlučujem</string>
+	<string name="erase_db">Zmazať DB</string>
+	<string name="erase_database">Zmazať databázu?</string>
+	<string name="are_you_sure_clean_whole_db">Naozaj chcete vymazať celú databázu?</string>
+	<string name="statistics">Štatistika</string>
+	<string name="cwg_count">Počet CWG:</string>
+	<string name="unique_cwg">Unikátnych CWG:</string>
+	<string name="duplicate_cwg">Duplicitných CWG:</string>
+	<string name="catalog_cwg">CWG v katalógu:</string>
+	<string name="importing">Importujem</string>
+	<string name="exporting">Exportujem</string>
+	<string name="please_wait">Prosím čakajte...</string>
+	<string name="title">Názov:</string>
+	<string name="catalog_title">Názov podľa katalógu:</string>
+	<string name="catalog_id">Katalóg ID:</string>
+	<string name="count">Počet:</string>
+	<string name="image">Obrázok:</string>
+	<string name="cant_merge_both_have_catalog">Nemôžem zlúčiť tieto CWG - obidva majú katalóg ID</string>
+	<string name="cant_remove_zero">Nemôžem odobrať CWG s nulovým počtom</string>
+	<string name="cant_import_duplicity">Nemôžem importovať duplicitné CWG</string>
+	<string name="cant_open_external_storage">Nemôžem otvoriť disk</string>
+	<string name="cant_open_file">Nemôžem otvoriť súbor:</string>
+	<string name="catalog_url">URL katalógu</string>
+	<string name="image_url">URL obrázkov</string>
+</resources>

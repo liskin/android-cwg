@@ -24,14 +24,14 @@
 	<string name="show_activity">CWG - Detail</string>
 
 	<string name="show">Zobrazit</string>
-	<string name="add_same">Přidat stejný</string>
+	<string name="add_same">Přidat stejné</string>
 	<string name="add_other_version">Přidat jinou verzi</string>
 	<string name="rename">Přejmenovat</string>
 	<string name="copy">Kopírovat</string>
 	<string name="delete">Smazat</string>
 	<string name="delete_cwg">Smazat CWG?</string>
 	<string name="are_you_sure_delete_cwg">Opravdu chcete smazat toto CWG?</string>
-	<string name="remove_one">Odebrat jeden</string>
+	<string name="remove_one">Odebrat jedno</string>
 	<string name="merge">Sloučit</string>
 	<string name="duplicity">Duplicity</string>
 	<string name="without_catalog">Bez katalogu</string>
