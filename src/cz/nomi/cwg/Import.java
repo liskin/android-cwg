@@ -17,7 +17,6 @@
 
 package cz.nomi.cwg;
 
-import java.io.IOException;
 import java.io.InputStream;
 
 abstract class Import {
@@ -34,5 +33,5 @@ abstract class Import {
 		return this.input;
 	}
 
-	abstract void importData(DatabaseAdapter db) throws IOException;
+	abstract void importData(DatabaseAdapter db) throws ImportException;
 }

@@ -282,12 +282,12 @@ public class MainActivity extends Activity {
 									Toast.LENGTH_LONG).show();
 						}
 					});
-				} catch (final IOException ioe) {
+				} catch (final ImportException ie) {
 					db.rollback();
 					handler.post(new Runnable() {
 						public void run() {
-							Toast.makeText(MainActivity.this, ioe.getClass().getName() +
-								": " + ioe.getMessage(),	Toast.LENGTH_LONG).show();
+							Toast.makeText(MainActivity.this, ie.getMessage(),
+								Toast.LENGTH_LONG).show();
 						}
 					});
 				}
@@ -332,11 +332,11 @@ public class MainActivity extends Activity {
 				try {
 					exporter.setOutput(output);
 					exporter.exportData(db.getAllCwg());
-				} catch (final IOException ioe) {
+				} catch (final ExportException ioe) {
 					handler.post(new Runnable() {
 						public void run() {
-							Toast.makeText(MainActivity.this, ioe.getClass().getName() +
-								": " + ioe.getMessage(), Toast.LENGTH_LONG).show();
+							Toast.makeText(MainActivity.this, ioe.getMessage(),
+								Toast.LENGTH_LONG).show();
 						}
 					});
 				}

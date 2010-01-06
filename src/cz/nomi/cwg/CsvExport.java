@@ -24,28 +24,31 @@ class CsvExport extends Export {
 	CsvExport() {
 	}
 
-	void exportData(Cursor cursor) throws IOException {
-		getOutput().write("\"Title\";\"Catalog title\";\"Catalog ID\";\"JPG\";\"Count\"\n".getBytes("UTF-8"));
-		while (cursor.moveToNext()) {
-			StringBuilder buffer = new StringBuilder();
-			String catalogTitle = cursor.getString(cursor.getColumnIndex("catalog_title"));
-			String catalogId = cursor.getString(cursor.getColumnIndex("catalog_id"));
-			String jpg = cursor.getString(cursor.getColumnIndex("jpg"));
-			buffer.append("\"");
-			buffer.append(cursor.getString(cursor.getColumnIndex("title")).replace("\"", "\\\""));
-			buffer.append("\";\"");
-			buffer.append(catalogTitle == null ? "" : catalogTitle);
-			buffer.append("\";\"");
-			buffer.append(catalogId == null ? "" : catalogId);
-			buffer.append("\";\"");
-			buffer.append(jpg == null ? "" : jpg);
-			buffer.append("\";\"");
-			buffer.append(cursor.getInt(cursor.getColumnIndex("count")));
-			buffer.append("\"");
-			buffer.append("\n");
-			getOutput().write(
-				buffer.toString().getBytes("UTF-8")
-			);
+	void exportData(Cursor cursor) throws ExportException {
+		try {
+			getOutput().write("\"Title\";\"Catalog title\";\"Catalog ID\";\"JPG\";\"Count\"\n".getBytes("UTF-8"));
+			while (cursor.moveToNext()) {
+				StringBuilder buffer = new StringBuilder();
+				String catalogTitle = cursor.getString(cursor.getColumnIndex("catalog_title"));
+				String catalogId = cursor.getString(cursor.getColumnIndex("catalog_id"));
+				String jpg = cursor.getString(cursor.getColumnIndex("jpg"));
+				buffer.append("\"");
+				buffer.append(cursor.getString(cursor.getColumnIndex("title")).replace("\"", "\\\""));
+				buffer.append("\";\"");
+				buffer.append(catalogTitle == null ? "" : catalogTitle);
+				buffer.append("\";\"");
+				buffer.append(catalogId == null ? "" : catalogId);
+				buffer.append("\";\"");
+				buffer.append(jpg == null ? "" : jpg);
+				buffer.append("\";\"");
+				buffer.append(cursor.getInt(cursor.getColumnIndex("count")));
+				buffer.append("\"");
+				buffer.append("\n");
+				getOutput().write(
+						buffer.toString().getBytes("UTF-8"));
+			}
+		} catch (IOException ioe) {
+			throw new ExportException(ioe.getClass().getName() + ": " + ioe.getMessage(), ioe);
 		}
 	}
 }

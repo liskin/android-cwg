@@ -17,27 +17,12 @@
 
 package cz.nomi.cwg;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-
-class TextImport extends Import {
-	TextImport() {
+public class ImportException extends Exception {
+	public ImportException(String message) {
+		super(message);
 	}
 
-	@Override
-	void importData(DatabaseAdapter db) throws ImportException {
-		try {
-			BufferedReader reader = new BufferedReader(new InputStreamReader(getInput()));
-			String line;
-			while ((line = reader.readLine()) != null) {
-				line = line.trim();
-				if (line.length() > 0) {
-					db.addCwg(line, null, null, null, 1);
-				}
-			}
-		} catch (IOException ioe) {
-			throw new ImportException(ioe.getClass().getName() + ": " + ioe.getMessage(), ioe);
-		}
+	public ImportException(String message, Throwable cause) {
+		super(message, cause);
 	}
 }

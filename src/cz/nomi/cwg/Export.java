@@ -18,7 +18,6 @@
 package cz.nomi.cwg;
 
 import android.database.Cursor;
-import java.io.IOException;
 import java.io.OutputStream;
 
 abstract class Export {
@@ -35,5 +34,5 @@ abstract class Export {
 		return this.output;
 	}
 
-	abstract void exportData(Cursor cursor) throws IOException;
+	abstract void exportData(Cursor cursor) throws ExportException;
 }

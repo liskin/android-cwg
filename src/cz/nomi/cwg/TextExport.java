@@ -25,12 +25,16 @@ class TextExport extends Export {
 	}
 
 	@Override
-	void exportData(Cursor cursor) throws IOException {
-		while (cursor.moveToNext()) {
-			getOutput().write(
+	void exportData(Cursor cursor) throws ExportException {
+		try {
+			while (cursor.moveToNext()) {
+				getOutput().write(
 					(cursor.getString(cursor.getColumnIndex("title")) +
 					"\n")
 					.getBytes("UTF-8"));
+			}
+		} catch (IOException ioe) {
+			throw new ExportException(ioe.getClass().getName() + ": " + ioe.getMessage(), ioe);
 		}
 	}
 }

@@ -18,7 +18,6 @@
 package cz.nomi.cwg;
 
 import android.database.Cursor;
-import android.util.Log;
 import java.io.IOException;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
@@ -130,18 +129,18 @@ class CatalogImport extends Import {
 	CatalogImport() {
 	}
 
-	void importData(DatabaseAdapter db) throws IOException {
+	void importData(DatabaseAdapter db) throws ImportException {
 		SAXParserFactory factory = SAXParserFactory.newInstance();
 		try {
 			SAXParser parser = factory.newSAXParser();
 			CatalogHandler handler = new CatalogHandler(db);
 			parser.parse(this.getInput(), handler);
 		} catch (ParserConfigurationException pce) {
-			Log.e(TAG, pce.getClass().getName() + ": " + pce.getMessage());
+			throw new ImportException(pce.getClass().getName() + ": " + pce.getMessage(), pce);
 		} catch (SAXException saxe) {
-			Log.e(TAG, saxe.getClass().getName() + ": " + saxe.getMessage());
+			throw new ImportException(saxe.getClass().getName() + ": " + saxe.getMessage(), saxe);
 		} catch (IOException ioe) {
-			Log.e(TAG, ioe.getClass().getName() + ": " + ioe.getMessage());
+			throw new ImportException(ioe.getClass().getName() + ": " + ioe.getMessage(), ioe);
 		}
 	}
 }

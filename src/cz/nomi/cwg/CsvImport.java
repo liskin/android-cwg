@@ -29,83 +29,88 @@ class CsvImport extends Import {
 	CsvImport() {
 	}
 
-	void importData(DatabaseAdapter db) throws IOException {
-		BufferedReader reader = new BufferedReader(new InputStreamReader(getInput()));
-		String line;
-		while ((line = reader.readLine()) != null) {
-			int col = 0;
-			int length = line.length();
-			boolean quote = false;
-			boolean escape = false;
-			Vector<StringBuilder> columns = new Vector<StringBuilder>();
-			columns.add(new StringBuilder());
-			for (int pos = 0 ; pos < length ; pos++) {
-				if (line.charAt(pos) == '\\') {
-					escape = !escape;
-					if (escape) {
+	@Override
+	void importData(DatabaseAdapter db) throws ImportException {
+		try {
+			BufferedReader reader = new BufferedReader(new InputStreamReader(getInput()));
+			String line;
+			while ((line = reader.readLine()) != null) {
+				int col = 0;
+				int length = line.length();
+				boolean quote = false;
+				boolean escape = false;
+				Vector<StringBuilder> columns = new Vector<StringBuilder>();
+				columns.add(new StringBuilder());
+				for (int pos = 0; pos < length; pos++) {
+					if (line.charAt(pos) == '\\') {
+						escape = !escape;
+						if (escape) {
+							continue;
+						}
+					}
+					if (!escape && (line.charAt(pos) == '"' || line.charAt(pos) == '\'')) {
+						quote = !quote;
 						continue;
 					}
-				}
-				if (!escape && (line.charAt(pos) == '"' || line.charAt(pos) == '\'')) {
-					quote = !quote;
-					continue;
-				}
-				if (!escape && !quote && (line.charAt(pos) == ',' || line.charAt(pos) == ';')) {
-					col++;
-					columns.add(new StringBuilder());
-					continue;
-				}
-				columns.get(col).append(line.charAt(pos));
-				escape = false;
-			}
-
-			switch (col) {
-				case 2:
-					// Version 0.1 + 0.2
-					String title = columns.get(0).toString().trim();
-					if (title.length() > 0) {
-						// Column 1 was version -> ignoring
-						String count = columns.get(2).toString().trim();
-						try {
-							int countI = Integer.parseInt(count);
-							db.addCwg(title, null, null, null, countI);
-						} catch (NumberFormatException nfe) {
-							Log.d(TAG, "Count is not number, skipping:" +
-								" count=" + count);
-						}
+					if (!escape && !quote && (line.charAt(pos) == ',' || line.charAt(pos) == ';')) {
+						col++;
+						columns.add(new StringBuilder());
+						continue;
 					}
-					break;
-				case 4:
-					// Version 0.3+
-					title = columns.get(0).toString().trim();
-					if (title.length() > 0) {
-						String catalogTitle = columns.get(1).toString().trim();
-						String catalogId = columns.get(2).toString().trim();
-						String jpg = columns.get(3).toString().trim();
-						String count = columns.get(4).toString().trim();
+					columns.get(col).append(line.charAt(pos));
+					escape = false;
+				}
 
-						if (catalogTitle.length() == 0) {
-							catalogTitle = null;
+				switch (col) {
+					case 2:
+						// Version 0.1 + 0.2
+						String title = columns.get(0).toString().trim();
+						if (title.length() > 0) {
+							// Column 1 was version -> ignoring
+							String count = columns.get(2).toString().trim();
+							try {
+								int countI = Integer.parseInt(count);
+								db.addCwg(title, null, null, null, countI);
+							} catch (NumberFormatException nfe) {
+								Log.d(TAG, "Count is not number, skipping:"
+										+ " count=" + count);
+							}
 						}
-						if (catalogId.length() == 0) {
-							catalogId = null;
+						break;
+					case 4:
+						// Version 0.3+
+						title = columns.get(0).toString().trim();
+						if (title.length() > 0) {
+							String catalogTitle = columns.get(1).toString().trim();
+							String catalogId = columns.get(2).toString().trim();
+							String jpg = columns.get(3).toString().trim();
+							String count = columns.get(4).toString().trim();
+
+							if (catalogTitle.length() == 0) {
+								catalogTitle = null;
+							}
+							if (catalogId.length() == 0) {
+								catalogId = null;
+							}
+							if (jpg.length() == 0) {
+								jpg = null;
+							}
+							try {
+								int countI = Integer.parseInt(count);
+								db.addCwg(title, catalogTitle, catalogId, jpg, countI);
+							} catch (NumberFormatException nfe) {
+								Log.d(TAG, "Count is not number, skipping:"
+										+ " count=" + count);
+							}
 						}
-						if (jpg.length() == 0) {
-							jpg = null;
-						}
-						try {
-							int	countI = Integer.parseInt(count);
-							db.addCwg(title, catalogTitle, catalogId, jpg, countI);
-						} catch (NumberFormatException nfe) {
-							Log.d(TAG, "Count is not number, skipping:" +
-								" count=" + count);
-						}
-					}
-					break;
-				default:
-					Log.e(TAG, "Unknown CSV version");
-					break;
+						break;
+					default:
+						Log.e(TAG, "Unknown CSV version");
+						break;
+				}
 			}
+		} catch (IOException ioe) {
+			throw new ImportException(ioe.getClass().getName() + ": " + ioe.getMessage(), ioe);
 		}
 	}
 }
