@@ -27,7 +27,7 @@ class CsvExport extends Export {
 	void exportData(Cursor cursor) throws IOException {
 		getOutput().write("\"Title\";\"Catalog title\";\"Catalog ID\";\"JPG\";\"Count\"\n".getBytes("UTF-8"));
 		while (cursor.moveToNext()) {
-			StringBuffer buffer = new StringBuffer();
+			StringBuilder buffer = new StringBuilder();
 			String catalogTitle = cursor.getString(cursor.getColumnIndex("catalog_title"));
 			String catalogId = cursor.getString(cursor.getColumnIndex("catalog_id"));
 			String jpg = cursor.getString(cursor.getColumnIndex("jpg"));

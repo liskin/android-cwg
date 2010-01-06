@@ -37,8 +37,8 @@ class CsvImport extends Import {
 			int length = line.length();
 			boolean quote = false;
 			boolean escape = false;
-			Vector<StringBuffer> columns = new Vector<StringBuffer>();
-			columns.add(new StringBuffer());
+			Vector<StringBuilder> columns = new Vector<StringBuilder>();
+			columns.add(new StringBuilder());
 			for (int pos = 0 ; pos < length ; pos++) {
 				if (line.charAt(pos) == '\\') {
 					escape = !escape;
@@ -52,7 +52,7 @@ class CsvImport extends Import {
 				}
 				if (!escape && !quote && (line.charAt(pos) == ',' || line.charAt(pos) == ';')) {
 					col++;
-					columns.add(new StringBuffer());
+					columns.add(new StringBuilder());
 					continue;
 				}
 				columns.get(col).append(line.charAt(pos));
