@@ -20,14 +20,109 @@ package cz.nomi.cwg;
 import android.database.Cursor;
 import android.util.Log;
 import java.io.IOException;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.FactoryConfigurationError;
 import javax.xml.parsers.ParserConfigurationException;
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
+import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
+import org.xml.sax.helpers.DefaultHandler;
+
+class CatalogHandler extends DefaultHandler {
+	private DatabaseAdapter db;
+	private StringBuilder catalogTitle;
+	private StringBuilder catalogId;
+	private StringBuilder jpg;
+	enum State {
+		NONE, CWG, ID_KATALOG, JMENO, JPG_OFICIALNI
+	}
+	private State state;
+
+	public CatalogHandler(DatabaseAdapter db) {
+		this.db = db;
+		this.state = State.NONE;
+	}
+
+	@Override
+	public void characters(char[] ch, int start, int length) throws SAXException {
+		super.characters(ch, start, length);
+		switch (this.state) {
+			case ID_KATALOG:
+				this.catalogId.append(ch, start, length);
+			break;
+			case JMENO:
+				this.catalogTitle.append(ch, start, length);
+			break;
+			case JPG_OFICIALNI:
+				this.jpg.append(ch, start, length);
+			break;
+		}
+	}
+
+	@Override
+	public void endElement(String uri, String localName, String qName) throws SAXException {
+		switch (this.state) {
+			case CWG:
+				if (localName.equals("cwg")) {
+					this.state = State.NONE;
+
+					// Save to DB
+					String sCatalogId = this.catalogId.toString().trim();
+					String sCatalogTitle = this.catalogTitle.toString().trim();
+					String sJpg = this.jpg.toString().trim();
+					Cursor cur = db.getCwgByCatalogId(sCatalogId);
+					if (cur == null) {
+						db.addCwg(sCatalogTitle, sCatalogTitle, sCatalogId, sJpg, 0);
+					} else {
+						long id = cur.getLong(cur.getColumnIndex("_id"));
+						int count = cur.getInt(cur.getColumnIndex("count"));
+						String title = cur.getString(cur.getColumnIndex("title"));
+						db.updateCwg(id, title, sCatalogTitle, sCatalogId, sJpg, count);
+						cur.close();
+					}
+				}
+			break;
+			case ID_KATALOG:
+				if (localName.equals("id_katalog")) {
+					this.state = State.CWG;
+				}
+			break;
+			case JMENO:
+				if (localName.equals("jmeno")) {
+					this.state = State.CWG;
+				}
+			break;
+			case JPG_OFICIALNI:
+				if (localName.equals("jpg_oficialni")) {
+					this.state = State.CWG;
+				}
+			break;
+		}
+	}
+
+	@Override
+	public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
+		switch (this.state) {
+			case NONE:
+				if (localName.equals("cwg")) {
+					this.state = State.CWG;
+					this.catalogId = new StringBuilder();
+					this.catalogTitle = new StringBuilder();
+					this.jpg = new StringBuilder();
+				}
+			break;
+			case CWG:
+				if (localName.equals("id_katalog")) {
+					this.state = State.ID_KATALOG;
+				} else if (localName.equals("jmeno")) {
+					this.state = State.JMENO;
+				} else if (localName.equals("jpg_oficialni")) {
+					this.state = State.JPG_OFICIALNI;
+				}
+			break;
+		}
+	}
+
+}
 
 class CatalogImport extends Import {
 	private static final String TAG = "CwgCatalogImport";
@@ -35,61 +130,18 @@ class CatalogImport extends Import {
 	CatalogImport() {
 	}
 
-	private String nodeValue(Node node) {
-		StringBuilder text = new StringBuilder();
-		NodeList chars = node.getChildNodes();
-		for (int k=0 ; k<chars.getLength() ; k++){
-			text.append(chars.item(k).getNodeValue());
-		}
-		return text.toString();
-	}
-
 	void importData(DatabaseAdapter db) throws IOException {
+		SAXParserFactory factory = SAXParserFactory.newInstance();
 		try {
-			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-			DocumentBuilder builder = factory.newDocumentBuilder();
-			Document dom = builder.parse(this.getInput());
-			Node node = dom.getDocumentElement().getFirstChild();
-			while (node != null) {
-				if (node.getNodeName().equals("cwg")) {
-					Node node2 = node.getFirstChild();
-					String idCatalog = null;
-					String catalogTitle = null;
-					String jpg = null;
-					while (node2 != null) {
-						if (node2.getNodeName().equals("id_katalog")) {
-							idCatalog = nodeValue(node2);
-						} else if (node2.getNodeName().equals("jmeno")) {
-							catalogTitle = nodeValue(node2);
-						} else if (node2.getNodeName().equals("jpg_oficialni")) {
-							jpg = nodeValue(node2);
-						}
-						node2 = node2.getNextSibling();
-					}
-
-					if (idCatalog != null && catalogTitle != null && jpg != null) {
-						Cursor cur = db.getCwgByCatalogId(idCatalog);
-						if (cur == null) {
-							db.addCwg(catalogTitle, catalogTitle, idCatalog, jpg, 0);
-						} else {
-							long id = cur.getLong(cur.getColumnIndex("_id"));
-							int count = cur.getInt(cur.getColumnIndex("count"));
-							String title = cur.getString(cur.getColumnIndex("title"));
-							db.updateCwg(id, title, catalogTitle, idCatalog, jpg, count);
-							cur.close();
-						}
-					}
-				}
-				node = node.getNextSibling();
-			}
-		} catch (FactoryConfigurationError fce) {
-			Log.e(TAG, "Factory configuration error: " + fce.getMessage());
+			SAXParser parser = factory.newSAXParser();
+			CatalogHandler handler = new CatalogHandler(db);
+			parser.parse(this.getInput(), handler);
 		} catch (ParserConfigurationException pce) {
-			Log.e(TAG, "Parser configuration error: " + pce.getMessage());
-		} catch (SAXException se) {
-			Log.e(TAG, "SAX error: " + se.getMessage());
+			Log.e(TAG, pce.getClass().getName() + ": " + pce.getMessage());
+		} catch (SAXException saxe) {
+			Log.e(TAG, saxe.getClass().getName() + ": " + saxe.getMessage());
 		} catch (IOException ioe) {
-			Log.e(TAG, "IO exception: " + ioe.getMessage());
+			Log.e(TAG, ioe.getClass().getName() + ": " + ioe.getMessage());
 		}
 	}
 }

@@ -59,19 +59,7 @@ class ProgressInputStream extends BufferedInputStream {
 	@Override
 	public synchronized int read(byte[] buffer, int offset, int length) throws IOException {
 		int c = super.read(buffer, offset, length);
-		if (c == -1) {
-			handler.post(new Runnable() {
-				public void run() {
-					dialog.dismiss();
-					dialog = new ProgressDialog(context);
-					dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-					dialog.setTitle(R.string.importing);
-					dialog.setMessage(context.getText(R.string.please_wait));
-					dialog.setCancelable(false);
-					dialog.show();
-				}
-			});
-		} else {
+		if (c > 0) {
 			this.readed += c;
 			updateDialog();
 		}
