@@ -28,6 +28,7 @@
 	<string name="pref_catalog_url">http://cwg.maxinoha.cz/cwg.xml</string>
 	<string name="pref_image_url">http://cwg.maxinoha.cz/img/</string>
 
+	<string name="search">Search</string>
 	<string name="show">Show</string>
 	<string name="add_same">Add same</string>
 	<string name="add_other_version">Add other version</string>

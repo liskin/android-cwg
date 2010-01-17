@@ -29,6 +29,7 @@
 			android:id="@+id/search"
 			android:layout_width="wrap_content"
 			android:layout_height="fill_parent"
+			android:hint="@string/search"
 			android:background="@android:drawable/editbox_background"
 			android:layout_weight="1"
 			android:singleLine="true"

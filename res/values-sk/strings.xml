@@ -25,6 +25,7 @@
 	<string name="statistics_activity">CWG - Štatistiky</string>
 	<string name="show_activity">CWG - Detail</string>
 
+	<string name="search">Vyhľadať</string>
 	<string name="show">Zobraziť</string>
 	<string name="add_same">Pridať rovnaké</string>
 	<string name="add_other_version">Pridať inú verziu</string>
@@ -35,7 +36,7 @@
 	<string name="are_you_sure_delete_cwg">Naozaj chcete zmazať toto CWG?</string>
 	<string name="remove_one">Odobrať jedno</string>
 	<string name="merge">Zlúčit</string>
-	<string name="all">Všetka</string>
+	<string name="all">Všetky</string>
 	<string name="duplicity">Duplicity</string>
 	<string name="without_catalog">Bez katalógu</string>
 	<string name="import_">Import</string>
