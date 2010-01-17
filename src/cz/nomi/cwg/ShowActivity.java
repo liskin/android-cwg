@@ -72,9 +72,13 @@ public class ShowActivity extends Activity {
 					if (cache == null) {
 						// Can't cache
 						if (!allowDownload) {
-							image.setImageDrawable(imageDownload);
-							imageProgress.setVisibility(View.GONE);
-							image.setVisibility(View.VISIBLE);
+							handler.post(new Runnable() {
+								public void run() {
+									image.setImageDrawable(imageDownload);
+									imageProgress.setVisibility(View.GONE);
+									image.setVisibility(View.VISIBLE);
+								}
+							});
 							return;
 						}
 						in = url.openStream();
@@ -82,9 +86,13 @@ public class ShowActivity extends Activity {
 						if (forceDownload || !cache.exists()) {
 							// Write to cache
 							if (!allowDownload) {
-								image.setImageDrawable(imageDownload);
-								imageProgress.setVisibility(View.GONE);
-								image.setVisibility(View.VISIBLE);
+								handler.post(new Runnable() {
+									public void run() {
+										image.setImageDrawable(imageDownload);
+										imageProgress.setVisibility(View.GONE);
+										image.setVisibility(View.VISIBLE);
+									}
+								});
 								return;
 							}
 							in = url.openStream();
