@@ -18,7 +18,6 @@
 package cz.nomi.cwg;
 
 import android.app.Activity;
-import android.content.DialogInterface;
 import android.view.View.OnClickListener;
 import android.content.SharedPreferences;
 import android.database.Cursor;
@@ -47,8 +46,9 @@ public class ShowActivity extends Activity {
 	private String jpg;
 	private ImageView image;
 	private ProgressBar imageProgress;
+	private Drawable imageDownload;
 
-	private void showImage(final boolean forceDownload) {
+	private void showImage(final boolean forceDownload, final boolean allowDownload) {
 		final Handler handler = new Handler();
 		image.setVisibility(View.GONE);
 		if (jpg == null) {
@@ -71,10 +71,22 @@ public class ShowActivity extends Activity {
 					URL url = new URL(imageUrl + jpg);
 					if (cache == null) {
 						// Can't cache
+						if (!allowDownload) {
+							image.setImageDrawable(imageDownload);
+							imageProgress.setVisibility(View.GONE);
+							image.setVisibility(View.VISIBLE);
+							return;
+						}
 						in = url.openStream();
 					} else {
 						if (forceDownload || !cache.exists()) {
 							// Write to cache
+							if (!allowDownload) {
+								image.setImageDrawable(imageDownload);
+								imageProgress.setVisibility(View.GONE);
+								image.setVisibility(View.VISIBLE);
+								return;
+							}
 							in = url.openStream();
 							OutputStream outCache =
 								new BufferedOutputStream(new FileOutputStream(cache));
@@ -101,7 +113,9 @@ public class ShowActivity extends Activity {
 				} catch (final MalformedURLException mue) {
 					handler.post(new Runnable() {
 						public void run() {
+							image.setImageDrawable(imageDownload);
 							imageProgress.setVisibility(View.GONE);
+							image.setVisibility(View.VISIBLE);
 							Toast.makeText(ShowActivity.this, mue.getClass().getName() +
 								": " + mue.getMessage(), Toast.LENGTH_LONG).show();
 						}
@@ -109,7 +123,9 @@ public class ShowActivity extends Activity {
 				} catch (final IOException ioe) {
 					handler.post(new Runnable() {
 						public void run() {
+							image.setImageDrawable(imageDownload);
 							imageProgress.setVisibility(View.GONE);
+							image.setVisibility(View.VISIBLE);
 							Toast.makeText(ShowActivity.this, ioe.getClass().getName() +
 								": " + ioe.getMessage(), Toast.LENGTH_LONG).show();
 						}
@@ -153,10 +169,17 @@ public class ShowActivity extends Activity {
 
 		this.image.setOnClickListener(new OnClickListener() {
 			public void onClick(View arg0) {
-				showImage(true);
+				showImage(true, true);
 			}
 		});
-		showImage(false);
+
+		imageDownload = getResources().getDrawable(R.drawable.download);
+		
+		SharedPreferences settings =
+		PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+		final boolean downloadImages = settings.getBoolean("download_images",
+				true);
+		showImage(false, downloadImages);
 	}
 
 	@Override

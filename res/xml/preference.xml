@@ -18,6 +18,11 @@
 
 <PreferenceScreen
 	xmlns:android="http://schemas.android.com/apk/res/android">
+	<CheckBoxPreference
+		android:key="download_images"
+		android:title="@string/download_images"
+		android:defaultValue="true"
+		/>
 	<EditTextPreference
 		android:key="catalog_url"
 		android:title="@string/catalog_url"

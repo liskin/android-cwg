@@ -15,9 +15,10 @@ public final class R {
         public static final int chart=0x7f020001;
         public static final int copy=0x7f020002;
         public static final int down=0x7f020003;
-        public static final int icon=0x7f020004;
-        public static final int tag=0x7f020005;
-        public static final int up=0x7f020006;
+        public static final int download=0x7f020004;
+        public static final int icon=0x7f020005;
+        public static final int tag=0x7f020006;
+        public static final int up=0x7f020007;
     }
     public static final class id {
         public static final int button=0x7f070005;
@@ -85,13 +86,14 @@ public final class R {
         public static final int catalog_cwg=0x7f050029;
         public static final int catalog_id=0x7f05002f;
         public static final int catalog_title=0x7f05002e;
-        public static final int catalog_url=0x7f050037;
+        public static final int catalog_url=0x7f050038;
         public static final int copy=0x7f05000e;
         public static final int count=0x7f050030;
         public static final int cwg_count=0x7f050026;
         public static final int decrement=0x7f050014;
         public static final int delete=0x7f05000f;
         public static final int delete_cwg=0x7f050010;
+        public static final int download_images=0x7f050037;
         public static final int duplicate_cwg=0x7f050028;
         public static final int duplicity=0x7f050016;
         public static final int erase_database=0x7f050023;
@@ -101,7 +103,7 @@ public final class R {
         public static final int export_text=0x7f05001c;
         public static final int exporting=0x7f05002b;
         public static final int image=0x7f050031;
-        public static final int image_url=0x7f050038;
+        public static final int image_url=0x7f050039;
         public static final int import_=0x7f050018;
         public static final int import_catalog=0x7f05001a;
         public static final int import_csv=0x7f05001d;
