@@ -104,11 +104,11 @@ public class MainActivity extends Activity {
 		NORMAL, DUPLICITY, NO_CATALOG
 	}
 	private DatabaseAdapter db;
-	private boolean duplicity = false;
 	private SimpleCursorAdapter listAdapter;
 	private Cursor listCursor;
 	private long mergeId = 0;
 	private Mode mode = Mode.NORMAL;
+	private Menu optionsMenu;
 
 	@Override
 	public void onCreate(Bundle icicle) {
@@ -212,14 +212,6 @@ public class MainActivity extends Activity {
 		super.onDestroy();
 
 		db.close();
-	}
-
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		MenuInflater inflater = getMenuInflater();
-		inflater.inflate(R.menu.main, menu);
-
-		return true;
 	}
 
 	private OutputStream newFileOutput(String fileName) {
@@ -365,15 +357,30 @@ public class MainActivity extends Activity {
 	}
 
 	private void reloadMode() {
+		MenuItem all = optionsMenu.findItem(R.id.menuAll);
+		MenuItem duplicity = optionsMenu.findItem(R.id.menuDuplicity);
+		MenuItem woCatalog = optionsMenu.findItem(R.id.menuWoCatalog);
 		switch (this.mode) {
 			case NORMAL:
 				listCursor = db.getAllCwg();
+				all.setVisible(false);
+				duplicity.setVisible(true);
+				woCatalog.setVisible(true);
+				this.setTitle(R.string.main_activity);
 				break;
 			case DUPLICITY:
 				listCursor = db.getDuplicityCwg();
+				all.setVisible(true);
+				duplicity.setVisible(false);
+				woCatalog.setVisible(true);
+				this.setTitle(R.string.main_activity_duplicity);
 				break;
 			case NO_CATALOG:
 				listCursor = db.getWoCatalogCwg();
+				all.setVisible(true);
+				duplicity.setVisible(true);
+				woCatalog.setVisible(false);
+				this.setTitle(R.string.main_activity_without_catalog);
 				break;
 		}
 		listAdapter.changeCursor(listCursor);
@@ -382,22 +389,27 @@ public class MainActivity extends Activity {
 	}
 
 	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		MenuInflater inflater = getMenuInflater();
+		inflater.inflate(R.menu.main, menu);
+		optionsMenu = menu;
+
+		return true;
+	}
+
+	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
+			case R.id.menuAll:
+				this.mode = Mode.NORMAL;
+				reloadMode();
+				return true;
 			case R.id.menuDuplicity:
-				if (this.mode == Mode.DUPLICITY) {
-					this.mode = Mode.NORMAL;
-				} else {
-					this.mode = Mode.DUPLICITY;
-				}
+				this.mode = Mode.DUPLICITY;
 				reloadMode();
 				return true;
 			case R.id.menuWoCatalog:
-				if (this.mode == Mode.NO_CATALOG) {
-					this.mode = Mode.NORMAL;
-				} else {
-					this.mode = Mode.NO_CATALOG;
-				}
+				this.mode = Mode.NO_CATALOG;
 				reloadMode();
 				return true;
 			case R.id.menuExportText:

@@ -17,6 +17,10 @@
 -->
 
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
+	<item android:id="@+id/menuAll"
+		android:title="@string/all"
+		android:icon="@drawable/all"
+		android:visible="false" />
 	<item android:id="@+id/menuDuplicity"
 		android:title="@string/duplicity"
 		android:icon="@drawable/copy" />

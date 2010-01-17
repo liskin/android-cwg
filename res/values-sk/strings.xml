@@ -19,6 +19,8 @@
 <resources>
 	<string name="app_name">Czech Wood Geocoin</string>
 	<string name="main_activity">CWG</string>
+	<string name="main_activity_duplicity">CWG - Duplicity</string>
+	<string name="main_activity_without_catalog">CWG - Bez katalógu</string>
 	<string name="preference_activity">CWG - Nastavenia</string>
 	<string name="statistics_activity">CWG - Štatistiky</string>
 	<string name="show_activity">CWG - Detail</string>
@@ -33,6 +35,7 @@
 	<string name="are_you_sure_delete_cwg">Naozaj chcete zmazať toto CWG?</string>
 	<string name="remove_one">Odobrať jedno</string>
 	<string name="merge">Zlúčit</string>
+	<string name="all">Všetka</string>
 	<string name="duplicity">Duplicity</string>
 	<string name="without_catalog">Bez katalógu</string>
 	<string name="import_">Import</string>
