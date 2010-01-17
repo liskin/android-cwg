@@ -71,14 +71,14 @@
 				android:gravity="right">
 			<ProgressBar
 				android:id="@+id/imageProgress"
-				android:layout_width="150px"
-				android:layout_height="150px"
+				android:layout_width="150dip"
+				android:layout_height="150dip"
 				android:visibility="gone"
 				/>
 			<ImageView
 				android:id="@+id/image"
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content"
+				android:layout_width="150dip"
+				android:layout_height="150dip"
 				android:visibility="gone"
 				/>
 		</LinearLayout>
