@@ -34,6 +34,7 @@ import android.preference.PreferenceManager;
 import android.text.ClipboardManager;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.LayoutInflater;
@@ -46,7 +47,6 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.EditText;
-import android.widget.FilterQueryProvider;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
@@ -101,7 +101,7 @@ public class MainActivity extends Activity {
 	}
 
 	private enum Mode {
-		NORMAL, DUPLICITY, NO_CATALOG
+		NORMAL, DUPLICITY, WITHOUT_CATALOG;
 	}
 	private DatabaseAdapter db;
 	private SimpleCursorAdapter listAdapter;
@@ -109,6 +109,8 @@ public class MainActivity extends Activity {
 	private long mergeId = 0;
 	private Mode mode = Mode.NORMAL;
 	private Menu optionsMenu;
+	private EditText search;
+	private Thread filterThread;
 
 	@Override
 	public void onCreate(Bundle icicle) {
@@ -120,8 +122,11 @@ public class MainActivity extends Activity {
 		db.open();
 
 		final ListView list = (ListView) findViewById(R.id.list);
-		final EditText search = (EditText) findViewById(R.id.search);
+		search = (EditText) findViewById(R.id.search);
 		final ImageView button = (ImageView) findViewById(R.id.button);
+
+		// Focus to search box
+		search.requestFocus();
 
 		// Title list
 		listCursor = db.getAllCwg();
@@ -137,25 +142,8 @@ public class MainActivity extends Activity {
 					R.id.listItemTitle,
 					R.id.listItemCount
 				});
-		listAdapter.setFilterQueryProvider(new FilterQueryProvider() {
-			public Cursor runQuery(CharSequence arg0) {
-				switch (MainActivity.this.mode) {
-					case NORMAL:
-						listCursor = db.getFilteredCwg(arg0.toString());
-						break;
-					case DUPLICITY:
-						listCursor = db.getDuplicityFilteredCwg(arg0.toString());
-						break;
-					case NO_CATALOG:
-						listCursor = db.getWoCatalogFilteredCwg(arg0.toString());
-						break;
-				}
-				return listCursor;
-			}
-		});
 		listAdapter.setViewBinder(new CustomViewBinder());
 		list.setAdapter(listAdapter);
-		list.setTextFilterEnabled(true);
 		registerForContextMenu(list);
 
 		// Search as you type
@@ -169,12 +157,7 @@ public class MainActivity extends Activity {
 			}
 
 			public void afterTextChanged(Editable arg0) {
-				String text = search.getText().toString().trim();
-				if (text.length() == 0) {
-					list.clearTextFilter();
-				} else {
-					list.setFilterText(text);
-				}
+				reloadFilter();
 			}
 		});
 
@@ -356,36 +339,87 @@ public class MainActivity extends Activity {
 		}.start();
 	}
 
+	private void reloadFilter() {
+		final Handler handler = new Handler();
+		if (filterThread != null) {
+			filterThread.interrupt();
+			try {
+				filterThread.join();
+			} catch (InterruptedException ie) {
+				return;
+			}
+		}
+		filterThread = new Thread() {
+			@Override
+			public void run() {
+				try {
+					Thread.sleep(200);
+				} catch (InterruptedException ie) {
+					return;
+				}
+				String text = search.getText().toString().trim();
+				if (text.length() == 0) {
+					switch (MainActivity.this.mode) {
+						case NORMAL:
+							listCursor = db.getAllCwg();
+							break;
+						case DUPLICITY:
+							listCursor = db.getDuplicityCwg();
+							break;
+						case WITHOUT_CATALOG:
+							listCursor = db.getWoCatalogCwg();
+							break;
+					}
+				} else {
+					switch (MainActivity.this.mode) {
+						case NORMAL:
+							listCursor = db.getFilteredCwg(text);
+							break;
+						case DUPLICITY:
+							listCursor = db.getDuplicityFilteredCwg(text);
+							break;
+						case WITHOUT_CATALOG:
+							listCursor = db.getWoCatalogFilteredCwg(text);
+							break;
+					}
+				}
+				handler.post(new Runnable() {
+					public void run() {
+						listAdapter.changeCursor(listCursor);
+						listAdapter.notifyDataSetInvalidated();
+						listAdapter.notifyDataSetChanged();
+					}
+				});
+			}
+		};
+		filterThread.start();
+	}
+
 	private void reloadMode() {
 		MenuItem all = optionsMenu.findItem(R.id.menuAll);
 		MenuItem duplicity = optionsMenu.findItem(R.id.menuDuplicity);
 		MenuItem woCatalog = optionsMenu.findItem(R.id.menuWoCatalog);
 		switch (this.mode) {
 			case NORMAL:
-				listCursor = db.getAllCwg();
 				all.setVisible(false);
 				duplicity.setVisible(true);
 				woCatalog.setVisible(true);
 				this.setTitle(R.string.main_activity);
 				break;
 			case DUPLICITY:
-				listCursor = db.getDuplicityCwg();
 				all.setVisible(true);
 				duplicity.setVisible(false);
 				woCatalog.setVisible(true);
 				this.setTitle(R.string.main_activity_duplicity);
 				break;
-			case NO_CATALOG:
-				listCursor = db.getWoCatalogCwg();
+			case WITHOUT_CATALOG:
 				all.setVisible(true);
 				duplicity.setVisible(true);
 				woCatalog.setVisible(false);
 				this.setTitle(R.string.main_activity_without_catalog);
 				break;
 		}
-		listAdapter.changeCursor(listCursor);
-		listAdapter.notifyDataSetInvalidated();
-		listAdapter.notifyDataSetChanged();
+		reloadFilter();
 	}
 
 	@Override
@@ -409,7 +443,7 @@ public class MainActivity extends Activity {
 				reloadMode();
 				return true;
 			case R.id.menuWoCatalog:
-				this.mode = Mode.NO_CATALOG;
+				this.mode = Mode.WITHOUT_CATALOG;
 				reloadMode();
 				return true;
 			case R.id.menuExportText:

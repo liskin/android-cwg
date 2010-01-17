@@ -19,11 +19,18 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
 			  android:orientation="vertical"
 			  android:layout_width="fill_parent"
-			  android:layout_height="fill_parent">
+			  android:layout_height="fill_parent"
+			  android:gravity="bottom">
+	<ListView
+		android:id="@+id/list"
+		android:layout_width="fill_parent"
+		android:layout_height="fill_parent"
+		android:layout_weight="1"
+		/>
 	<LinearLayout
 		android:orientation="horizontal"
 		android:layout_width="fill_parent"
-		android:layout_height="40sp"
+		android:layout_height="wrap_content"
 		>
 		<EditText
 			android:id="@+id/search"
@@ -34,6 +41,7 @@
 			android:layout_weight="1"
 			android:singleLine="true"
 			android:imeOptions="actionDone"
+			android:textSize="25sp"
 			/>
 		<ImageView
 			android:src="@android:drawable/ic_input_add"
@@ -42,9 +50,4 @@
 			android:layout_height="fill_parent"
 			/>
 	</LinearLayout>
-	<ListView
-		android:id="@+id/list"
-		android:layout_width="fill_parent"
-		android:layout_height="fill_parent"
-		/>
 </LinearLayout>
