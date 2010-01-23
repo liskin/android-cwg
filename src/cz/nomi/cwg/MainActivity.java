@@ -159,7 +159,7 @@ public class MainActivity extends Activity {
 			}
 
 			public void afterTextChanged(Editable arg0) {
-				reloadFilter();
+				reloadFilter(true);
 			}
 		});
 
@@ -341,7 +341,7 @@ public class MainActivity extends Activity {
 		}.start();
 	}
 
-	private void reloadFilter() {
+	private void reloadFilter(final boolean sleep) {
 		final Handler handler = new Handler();
 		if (filterThread != null) {
 			filterThread.interrupt();
@@ -355,7 +355,9 @@ public class MainActivity extends Activity {
 			@Override
 			public void run() {
 				try {
-					Thread.sleep(200);
+					if (sleep) {
+						Thread.sleep(200);
+					}
 				} catch (InterruptedException ie) {
 					return;
 				}
@@ -421,7 +423,7 @@ public class MainActivity extends Activity {
 				this.setTitle(R.string.main_activity_without_catalog);
 				break;
 		}
-		reloadFilter();
+		reloadFilter(false);
 	}
 
 	@Override
