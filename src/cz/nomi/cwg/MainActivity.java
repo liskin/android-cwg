@@ -56,9 +56,11 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.zip.ZipInputStream;
 
 public class MainActivity extends Activity {
 	class CustomViewBinder implements SimpleCursorAdapter.ViewBinder {
@@ -467,14 +469,30 @@ public class MainActivity extends Activity {
 				try {
 					SharedPreferences settings =
 							PreferenceManager.getDefaultSharedPreferences(getBaseContext());
-					String catalogUrl = settings.getString("catalog_url",
+					boolean catalogUseZip = settings.getBoolean("catalog_use_zip",
+							getText(R.string.pref_catalog_use_zip).equals("true"));
+					InputStream input;
+					long length;
+					if (catalogUseZip) {
+						String catalogZipUrl = settings.getString("catalog_zip_url",
+							getText(R.string.pref_catalog_zip_url).toString());
+						URL url = new URL(catalogZipUrl);
+						HttpURLConnection http = (HttpURLConnection) url.openConnection();
+						ZipInputStream zip = new ZipInputStream(http.getInputStream());
+						input = zip;
+						length = zip.getNextEntry().getSize();
+					} else {
+						String catalogUrl = settings.getString("catalog_url",
 							getText(R.string.pref_catalog_url).toString());
 
+						URL url = new URL(catalogUrl);
+						HttpURLConnection http = (HttpURLConnection) url.openConnection();
+						input = http.getInputStream();
+						length = http.getContentLength();
+					}
 					CatalogImport catalogImport = new CatalogImport();
-					URL url = new URL(catalogUrl);
-					HttpURLConnection http = (HttpURLConnection) url.openConnection();
 					doImport(catalogImport, new ProgressInputStream(this,
-							http.getInputStream(), http.getContentLength()));
+						input, length));
 				} catch (IOException ioe) {
 					Toast.makeText(this, ioe.getClass().getName() + ": " + ioe.getMessage(),
 							Toast.LENGTH_LONG).show();

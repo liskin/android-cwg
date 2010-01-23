@@ -25,7 +25,10 @@
 	<string name="statistics_activity">CWG Statistics</string>
 	<string name="show_activity">CWG Detail</string>
 
+	<string name="pref_download_images">true</string>
+	<string name="pref_catalog_use_zip">true</string>
 	<string name="pref_catalog_url">http://cwg.maxinoha.cz/cwg.xml</string>
+	<string name="pref_catalog_zip_url">http://cwg.maxinoha.cz/cwgxml.zip</string>
 	<string name="pref_image_url">http://cwg.maxinoha.cz/img/</string>
 
 	<string name="search">Search</string>
@@ -75,6 +78,8 @@
 	<string name="cant_open_external_storage">Can't open external storage</string>
 	<string name="cant_open_file">Can't open file:</string>
 	<string name="download_images">Download images</string>
+	<string name="catalog_use_zip">Use ZIP catalog</string>
 	<string name="catalog_url">Catalog URL</string>
+	<string name="catalog_zip_url">Catalog ZIP URL</string>
 	<string name="image_url">Image URL</string>
 </resources>

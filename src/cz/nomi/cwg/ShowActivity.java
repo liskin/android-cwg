@@ -186,7 +186,7 @@ public class ShowActivity extends Activity {
 		SharedPreferences settings =
 		PreferenceManager.getDefaultSharedPreferences(getBaseContext());
 		final boolean downloadImages = settings.getBoolean("download_images",
-				true);
+				getText(R.string.pref_download_images).equals("true"));
 		showImage(false, downloadImages);
 	}
 
