@@ -21,9 +21,9 @@
 	<string name="main_activity">CWG</string>
 	<string name="main_activity_duplicity">CWG - Duplicity</string>
 	<string name="main_activity_without_catalog">CWG - Without catalog</string>
-	<string name="preference_activity">CWG Preferences</string>
-	<string name="statistics_activity">CWG Statistics</string>
-	<string name="show_activity">CWG Detail</string>
+	<string name="preference_activity">CWG - Preferences</string>
+	<string name="statistics_activity">CWG - Statistics</string>
+	<string name="show_activity">CWG - Detail</string>
 
 	<string name="pref_download_images">true</string>
 	<string name="pref_catalog_use_zip">true</string>

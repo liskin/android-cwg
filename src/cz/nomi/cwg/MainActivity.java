@@ -36,6 +36,7 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -676,6 +677,21 @@ public class MainActivity extends Activity {
 				return true;
 			default:
 				return super.onContextItemSelected(item);
+		}
+	}
+
+	@Override
+	public boolean onKeyDown(int keyCode, KeyEvent event) {
+		if (keyCode == KeyEvent.KEYCODE_BACK) {
+			if (this.mode != Mode.NORMAL) {
+				this.mode = Mode.NORMAL;
+				reloadMode();
+				return true;
+			} else {
+				return super.onKeyDown(keyCode, event);
+			}
+		} else {
+			return super.onKeyDown(keyCode, event);
 		}
 	}
 }
