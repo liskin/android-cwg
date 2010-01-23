@@ -71,6 +71,8 @@
 	<string name="cant_open_external_storage">Nemôžem otvoriť disk</string>
 	<string name="cant_open_file">Nemôžem otvoriť súbor:</string>
 	<string name="download_images">Sťahovať obrázky</string>
+	<string name="catalog_use_zip">Používať ZIP katalóg</string>
+	<string name="catalog_zip_url">URL ZIP katalógu</string>
 	<string name="catalog_url">URL katalógu</string>
 	<string name="image_url">URL obrázkov</string>
 </resources>
