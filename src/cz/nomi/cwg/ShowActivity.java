@@ -18,6 +18,8 @@
 package cz.nomi.cwg;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.view.View.OnClickListener;
 import android.content.SharedPreferences;
 import android.database.Cursor;
@@ -25,7 +27,13 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
+import android.text.ClipboardManager;
+import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -43,6 +51,7 @@ import java.net.URL;
 
 public class ShowActivity extends Activity {
 	private DatabaseAdapter db;
+	private long cwgId;
 	private String jpg;
 	private ImageView image;
 	private ProgressBar imageProgress;
@@ -143,6 +152,25 @@ public class ShowActivity extends Activity {
 		}.start();
 	}
 
+	private void fill() {
+		TextView showTitle = (TextView) findViewById(R.id.show_title);
+		TextView showCatalogTitle = (TextView) findViewById(R.id.show_catalog_title);
+		TextView showCatalogId = (TextView) findViewById(R.id.show_catalog_id);
+		TextView showCount = (TextView) findViewById(R.id.show_count);
+		this.image = (ImageView) findViewById(R.id.image);
+		this.imageProgress = (ProgressBar) findViewById(R.id.imageProgress);
+
+		Cursor cur = db.getCwg(cwgId);
+		showTitle.setText(cur.getString(cur.getColumnIndex("title")));
+		showCatalogTitle.setText(cur.getString(cur.getColumnIndex("catalog_title")));
+		showCatalogId.setText(cur.getString(cur.getColumnIndex("catalog_id")));
+		showCount.setText(cur.getString(cur.getColumnIndex("count")));
+		this.jpg = cur.getString(cur.getColumnIndex("jpg"));
+
+		cur.close();
+
+	}
+
 	@Override
     public void onCreate(Bundle icicle) {
         super.onCreate(icicle);
@@ -157,23 +185,8 @@ public class ShowActivity extends Activity {
 			return;
 		}
 
-		long cwgId = extras.getLong("cwgId");
-		Cursor cur = db.getCwg(cwgId);
-
-		TextView showTitle = (TextView) findViewById(R.id.show_title);
-		TextView showCatalogTitle = (TextView) findViewById(R.id.show_catalog_title);
-		TextView showCatalogId = (TextView) findViewById(R.id.show_catalog_id);
-		TextView showCount = (TextView) findViewById(R.id.show_count);
-		this.image = (ImageView) findViewById(R.id.image);
-		this.imageProgress = (ProgressBar) findViewById(R.id.imageProgress);
-
-		showTitle.setText(cur.getString(cur.getColumnIndex("title")));
-		showCatalogTitle.setText(cur.getString(cur.getColumnIndex("catalog_title")));
-		showCatalogId.setText(cur.getString(cur.getColumnIndex("catalog_id")));
-		showCount.setText(cur.getString(cur.getColumnIndex("count")));
-		this.jpg = cur.getString(cur.getColumnIndex("jpg"));
-
-		cur.close();
+		cwgId = extras.getLong("cwgId");
+		fill();
 
 		this.image.setOnClickListener(new OnClickListener() {
 			public void onClick(View arg0) {
@@ -195,5 +208,98 @@ public class ShowActivity extends Activity {
 		super.onDestroy();
 
 		db.close();
+	}
+
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		MenuInflater inflater = getMenuInflater();
+		inflater.inflate(R.menu.show, menu);
+
+		return true;
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		Cursor cur;
+		switch (item.getItemId()) {
+			case R.id.menuAddSame:
+				db.incCwg(cwgId);
+				fill();
+				return true;
+			case R.id.menuAddOther:
+				cur = db.getCwg(cwgId);
+				db.addCwg(
+						cur.getString(cur.getColumnIndex("title")),
+						null,
+						null,
+						null,
+						1
+				);
+				cur.close();
+				return true;
+			case R.id.menuRename:
+				cur = db.getCwg(cwgId);
+				final String title = cur.getString(cur.getColumnIndex("title"));
+				final String catalogTitle = cur.getString(cur.getColumnIndex("catalog_title"));
+				final String catalogId = cur.getString(cur.getColumnIndex("catalog_id"));
+				final String jpg = cur.getString(cur.getColumnIndex("jpg"));
+				final int count = cur.getInt(cur.getColumnIndex("count"));
+				cur.close();
+
+				LayoutInflater factory = LayoutInflater.from(this);
+				final View textEntryView = factory.inflate(R.layout.dialog_rename, null);
+				final EditText edit = (EditText) textEntryView.findViewById(R.id.rename_title);
+				edit.setText(title);
+				cur.close();
+				AlertDialog alertDialog = new AlertDialog.Builder(this).create();
+				if (catalogTitle == null) {
+					alertDialog.setTitle(title);
+				} else {
+					alertDialog.setTitle(catalogTitle);
+				}
+				alertDialog.setView(textEntryView);
+				alertDialog.setButton(getText(android.R.string.ok), new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int which) {
+						db.updateCwg(cwgId, edit.getText().toString(), catalogTitle, catalogId, jpg, count);
+						fill();
+					}
+				});
+				alertDialog.setButton2(getText(android.R.string.cancel), new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int which) {
+						return;
+					}
+				});
+				alertDialog.show();
+				return true;
+			case R.id.menuCopy:
+				cur = db.getCwg(cwgId);
+				ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
+				clipboard.setText(cur.getString(cur.getColumnIndex("title")));
+				cur.close();
+				return true;
+			case R.id.menuRemoveOne:
+				db.decCwg(cwgId);
+				fill();
+				return true;
+			case R.id.menuDelete:
+				AlertDialog dialog = new AlertDialog.Builder(this).create();
+				dialog.setTitle(R.string.delete_cwg);
+				dialog.setMessage(getText(R.string.are_you_sure_delete_cwg));
+				dialog.setButton(getText(android.R.string.ok), new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int which) {
+						db.deleteCwg(cwgId);
+						ShowActivity.this.finish();
+					}
+				});
+				dialog.setButton2(getText(android.R.string.cancel), new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int which) {
+						return;
+					}
+				});
+				dialog.show();
+				return true;
+			default:
+				return super.onContextItemSelected(item);
+		}
 	}
 }

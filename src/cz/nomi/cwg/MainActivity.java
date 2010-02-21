@@ -180,7 +180,9 @@ public class MainActivity extends Activity {
 		list.setOnItemClickListener(new OnItemClickListener() {
 			public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long id) {
 				if (MainActivity.this.mergeId == 0) {
-					MainActivity.this.openContextMenu(arg1);
+					Intent myIntent = new Intent(MainActivity.this, ShowActivity.class);
+					myIntent.putExtra("cwgId", id);
+					MainActivity.this.startActivity(myIntent);
 				} else {
 					db.mergeCwg(MainActivity.this.mergeId, id);
 					listCursor.requery();
@@ -695,5 +697,12 @@ public class MainActivity extends Activity {
 		} else {
 			return super.onKeyDown(keyCode, event);
 		}
+	}
+
+	@Override
+	protected void onStart() {
+		super.onStart();
+
+		reloadFilter(false);
 	}
 }

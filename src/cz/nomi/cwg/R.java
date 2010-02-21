@@ -68,6 +68,7 @@ public final class R {
     public static final class menu {
         public static final int context=0x7f060000;
         public static final int main=0x7f060001;
+        public static final int show=0x7f060002;
     }
     public static final class string {
         public static final int add_other_version=0x7f05000f;
