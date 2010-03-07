@@ -125,6 +125,7 @@ public class MainActivity extends Activity {
 	private Menu optionsMenu;
 	private EditText search;
 	private Thread filterThread;
+	private SharedPreferences settings;
 
 	@Override
 	public void onCreate(Bundle icicle) {
@@ -138,6 +139,9 @@ public class MainActivity extends Activity {
 		final ListView list = (ListView) findViewById(R.id.list);
 		search = (EditText) findViewById(R.id.search);
 		final ImageView button = (ImageView) findViewById(R.id.button);
+
+		settings =
+				PreferenceManager.getDefaultSharedPreferences(getBaseContext());
 
 		// Focus to search box
 		search.requestFocus();
@@ -192,9 +196,18 @@ public class MainActivity extends Activity {
 		list.setOnItemClickListener(new OnItemClickListener() {
 			public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long id) {
 				if (MainActivity.this.mergeId == 0) {
-					Intent myIntent = new Intent(MainActivity.this, ShowActivity.class);
-					myIntent.putExtra("cwgId", id);
-					MainActivity.this.startActivity(myIntent);
+					SharedPreferences settings =
+							PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+					boolean autoOpen = settings.getBoolean("auto_open_cwg",
+							getText(R.string.pref_auto_open_cwg).equals("true"));
+
+					if (autoOpen) {
+						Intent myIntent = new Intent(MainActivity.this, ShowActivity.class);
+						myIntent.putExtra("cwgId", id);
+						MainActivity.this.startActivity(myIntent);
+					} else {
+						MainActivity.this.openContextMenu(arg1);
+					}
 				} else {
 					db.mergeCwg(MainActivity.this.mergeId, id);
 					listCursor.requery();
@@ -479,8 +492,6 @@ public class MainActivity extends Activity {
 				return true;
 			case R.id.menuExportWeb:
 				try {
-					SharedPreferences settings =
-						PreferenceManager.getDefaultSharedPreferences(getBaseContext());
 					String url = settings.getString("web_export_url", "");
 					String token = settings.getString("web_export_token", "");
 
@@ -538,8 +549,6 @@ public class MainActivity extends Activity {
 				return true;
 			case R.id.menuImportCatalog:
 				try {
-					SharedPreferences settings =
-							PreferenceManager.getDefaultSharedPreferences(getBaseContext());
 					boolean catalogUseZip = settings.getBoolean("catalog_use_zip",
 							getText(R.string.pref_catalog_use_zip).equals("true"));
 					InputStream input;
@@ -630,6 +639,10 @@ public class MainActivity extends Activity {
 			ContextMenuInfo menuInfo) {
 		MenuInflater inflater = getMenuInflater();
 		inflater.inflate(R.menu.context, menu);
+
+		boolean autoOpen = settings.getBoolean("auto_open_cwg",
+				getText(R.string.pref_auto_open_cwg).equals("true"));
+		menu.findItem(R.id.menuShow).setVisible(!autoOpen);
 
 		AdapterContextMenuInfo info = (AdapterContextMenuInfo) menuInfo;
 		Cursor cur = db.getCwg(info.id);

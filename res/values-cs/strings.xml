@@ -71,6 +71,7 @@
 	<string name="cant_import_duplicity">Není možné importovat duplicitní CWG</string>
 	<string name="cant_open_external_storage">Nemohu otevřít disk</string>
 	<string name="cant_open_file">Nemohu otevřít soubor:</string>
+	<string name="auto_open_cwg">Automaticky otevřít CWG</string>
 	<string name="download_images">Stahovat obrázky</string>
 	<string name="catalog_use_zip">Používat ZIP katalog</string>
 	<string name="catalog_url">URL katalogu</string>

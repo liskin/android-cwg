@@ -25,6 +25,7 @@
 	<string name="statistics_activity">CWG - Statistics</string>
 	<string name="show_activity">CWG - Detail</string>
 
+	<string name="pref_auto_open_cwg">true</string>
 	<string name="pref_download_images">true</string>
 	<string name="pref_catalog_use_zip">true</string>
 	<string name="pref_catalog_url">http://cwg.maxinoha.cz/cwg.xml</string>
@@ -77,6 +78,7 @@
 	<string name="cant_import_duplicity">Can't import duplicate CWG</string>
 	<string name="cant_open_external_storage">Can't open external storage</string>
 	<string name="cant_open_file">Can't open file:</string>
+	<string name="auto_open_cwg">Auto-open CWG</string>
 	<string name="download_images">Download images</string>
 	<string name="catalog_use_zip">Use ZIP catalog</string>
 	<string name="catalog_url">Catalog URL</string>
