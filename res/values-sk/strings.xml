@@ -46,6 +46,7 @@
 	<string name="export_text">Exportovať text</string>
 	<string name="import_csv">Importovať CSV</string>
 	<string name="export_csv">Exportovať CSV</string>
+	<string name="export_web">Exportovať na web</string>
 	<string name="preference">Nastavenia</string>
 	<string name="auto_merge">Automaticky zlúčiť</string>
 	<string name="auto_merging">Automaticky zlučujem</string>
@@ -72,7 +73,11 @@
 	<string name="cant_open_file">Nemôžem otvoriť súbor:</string>
 	<string name="download_images">Sťahovať obrázky</string>
 	<string name="catalog_use_zip">Používať ZIP katalóg</string>
-	<string name="catalog_zip_url">URL ZIP katalógu</string>
 	<string name="catalog_url">URL katalógu</string>
+	<string name="catalog_zip_url">URL ZIP katalógu</string>
 	<string name="image_url">URL obrázkov</string>
+	<string name="web_export_url">URL exportu na web</string>
+	<string name="web_export_token">Token exportu na web</string>
+	<string name="url_is_not_set">URL nie je nastavené</string>
+	<string name="token_is_not_set">Token nie je nastavený</string>
 </resources>
