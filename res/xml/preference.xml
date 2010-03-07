@@ -19,9 +19,9 @@
 <PreferenceScreen
 	xmlns:android="http://schemas.android.com/apk/res/android">
 	<CheckBoxPreference
-		android:key="auto_open_cwg"
-		android:title="@string/auto_open_cwg"
-		android:defaultValue="@string/pref_auto_open_cwg"
+		android:key="auto_show_cwg"
+		android:title="@string/auto_show_cwg"
+		android:defaultValue="@string/pref_auto_show_cwg"
 		/>
 	<CheckBoxPreference
 		android:key="download_images"

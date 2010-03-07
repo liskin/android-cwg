@@ -198,8 +198,8 @@ public class MainActivity extends Activity {
 				if (MainActivity.this.mergeId == 0) {
 					SharedPreferences settings =
 							PreferenceManager.getDefaultSharedPreferences(getBaseContext());
-					boolean autoOpen = settings.getBoolean("auto_open_cwg",
-							getText(R.string.pref_auto_open_cwg).equals("true"));
+					boolean autoOpen = settings.getBoolean("auto_show_cwg",
+							getText(R.string.pref_auto_show_cwg).equals("true"));
 
 					if (autoOpen) {
 						Intent myIntent = new Intent(MainActivity.this, ShowActivity.class);
@@ -640,8 +640,8 @@ public class MainActivity extends Activity {
 		MenuInflater inflater = getMenuInflater();
 		inflater.inflate(R.menu.context, menu);
 
-		boolean autoOpen = settings.getBoolean("auto_open_cwg",
-				getText(R.string.pref_auto_open_cwg).equals("true"));
+		boolean autoOpen = settings.getBoolean("auto_show_cwg",
+				getText(R.string.pref_auto_show_cwg).equals("true"));
 		menu.findItem(R.id.menuShow).setVisible(!autoOpen);
 
 		AdapterContextMenuInfo info = (AdapterContextMenuInfo) menuInfo;

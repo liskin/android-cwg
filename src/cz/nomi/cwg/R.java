@@ -80,7 +80,7 @@ public final class R {
         public static final int are_you_sure_delete_cwg=0x7f050015;
         public static final int auto_merge=0x7f050024;
         public static final int auto_merging=0x7f050025;
-        public static final int auto_open_cwg=0x7f05003b;
+        public static final int auto_show_cwg=0x7f05003b;
         public static final int cant_import_duplicity=0x7f050038;
         public static final int cant_merge_both_have_catalog=0x7f050036;
         public static final int cant_open_external_storage=0x7f050039;
@@ -119,7 +119,7 @@ public final class R {
         public static final int main_activity_without_catalog=0x7f050003;
         public static final int merge=0x7f050017;
         public static final int please_wait=0x7f050030;
-        public static final int pref_auto_open_cwg=0x7f050007;
+        public static final int pref_auto_show_cwg=0x7f050007;
         public static final int pref_catalog_url=0x7f05000a;
         public static final int pref_catalog_use_zip=0x7f050009;
         public static final int pref_catalog_zip_url=0x7f05000b;
