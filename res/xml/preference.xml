@@ -43,4 +43,14 @@
 		android:title="@string/image_url"
 		android:defaultValue="@string/pref_image_url"
 		/>
+	<EditTextPreference
+		android:key="web_export_url"
+		android:title="@string/web_export_url"
+		android:defaultValue=""
+		/>
+	<EditTextPreference
+		android:key="web_export_token"
+		android:title="@string/web_export_token"
+		android:defaultValue=""
+		/>
 </PreferenceScreen>

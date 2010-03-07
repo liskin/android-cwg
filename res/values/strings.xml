@@ -53,6 +53,7 @@
 	<string name="export_text">Export text</string>
 	<string name="import_csv">Import CSV</string>
 	<string name="export_csv">Export CSV</string>
+	<string name="export_web">Export to web</string>
 	<string name="preference">Preferences</string>
 	<string name="auto_merge">Auto-merge</string>
 	<string name="auto_merging">Auto-merging</string>
@@ -82,4 +83,8 @@
 	<string name="catalog_url">Catalog URL</string>
 	<string name="catalog_zip_url">Catalog ZIP URL</string>
 	<string name="image_url">Image URL</string>
+	<string name="web_export_url">Web export URL</string>
+	<string name="web_export_token">Web export token</string>
+	<string name="url_is_not_set">URL is not set</string>
+	<string name="token_is_not_set">Token is not set</string>
 </resources>

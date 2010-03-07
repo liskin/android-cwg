@@ -45,6 +45,8 @@
 				android:title="@string/export_text" />
 			<item android:id="@+id/menuExportCsv"
 				android:title="@string/export_csv" />
+			<item android:id="@+id/menuExportWeb"
+				android:title="@string/export_web" />
 		</menu>
 	</item>
 	<item android:id="@+id/menuStatistics"

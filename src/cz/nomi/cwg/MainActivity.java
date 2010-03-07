@@ -52,6 +52,7 @@ import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -61,7 +62,18 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.zip.ZipInputStream;
+import org.apache.http.Header;
+import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicNameValuePair;
 
 public class MainActivity extends Activity {
 	class CustomViewBinder implements SimpleCursorAdapter.ViewBinder {
@@ -464,6 +476,60 @@ public class MainActivity extends Activity {
 			case R.id.menuExportCsv:
 				CsvExport csvExport = new CsvExport();
 				doExport(csvExport, newFileOutput("cwg.csv"));
+				return true;
+			case R.id.menuExportWeb:
+				try {
+					SharedPreferences settings =
+						PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+					String url = settings.getString("web_export_url", "");
+					String token = settings.getString("web_export_token", "");
+
+					if (url.length() == 0) {
+						Toast.makeText(this, getText(R.string.url_is_not_set),
+								Toast.LENGTH_LONG).show();
+						return true;
+					}
+
+					if (token.length() == 0) {
+						Toast.makeText(this, getText(R.string.token_is_not_set),
+								Toast.LENGTH_LONG).show();
+						return true;
+					}
+
+					ByteArrayOutputStream writer = new ByteArrayOutputStream();
+					CsvExport webExport = new CsvExport();
+					doExport(webExport, writer);
+
+					HttpClient httpClient = new DefaultHttpClient();
+					HttpPost httpPost = new HttpPost(url);
+
+					List<NameValuePair> data = new ArrayList<NameValuePair>(2);
+					data.add(new BasicNameValuePair("token", token));
+					data.add(new BasicNameValuePair("csv", writer.toString()));
+					httpPost.setEntity(new UrlEncodedFormEntity(data));
+
+					HttpResponse response = httpClient.execute(httpPost);
+					if (response.getStatusLine().getStatusCode() != 200) {
+						Header[] headers = response.getHeaders("Error");
+						if (headers.length > 0) {
+							for (Header header : response.getHeaders("Error")) {
+								Toast.makeText(this, header.getValue(), Toast.LENGTH_LONG).show();
+							}
+						} else {
+								Toast.makeText(this,
+									Integer.toString(response.getStatusLine().getStatusCode()) + " " +
+									response.getStatusLine().getReasonPhrase(),
+									Toast.LENGTH_LONG).show();
+						}
+					}
+				} catch (ClientProtocolException cpe) {
+					Toast.makeText(this, cpe.getClass().getName() + ": " + cpe.getMessage(),
+							Toast.LENGTH_LONG).show();
+				} catch (IOException ioe) {
+					Toast.makeText(this, ioe.getClass().getName() + ": " + ioe.getMessage(),
+							Toast.LENGTH_LONG).show();
+				}
+
 				return true;
 			case R.id.menuImportCsv:
 				CsvImport csvImport = new CsvImport();
