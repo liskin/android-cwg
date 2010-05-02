@@ -20,6 +20,7 @@ package cz.nomi.cwg;
 import android.os.Environment;
 import android.util.Log;
 import java.io.File;
+import java.io.IOException;
 
 class Storage {
 	private static final String TAG = "CwgStorage";
@@ -47,6 +48,14 @@ class Storage {
 		} else {
 			if (!root.exists()) {
 				root.mkdir();
+			}
+			File noMedia = new File(root, ".nomedia");
+			if (!noMedia.exists()) {
+				try {
+					noMedia.createNewFile();
+				} catch (IOException ioe) {
+					Log.e(TAG, "Can't create .nomedia file: " + ioe.getMessage());
+				}
 			}
 			return new File(root, name);
 		}
