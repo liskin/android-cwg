@@ -318,9 +318,9 @@ public class MainActivity extends Activity {
 		}.start();
 	}
 
-	private void doExport(final Export exporter, final OutputStream output) {
+	private Thread doExport(final Export exporter, final OutputStream output) {
 		if (output == null) {
-			return;
+			return null;
 		}
 		final ProgressDialog progress = new ProgressDialog(this);
 		progress.setIndeterminate(true);
@@ -330,7 +330,7 @@ public class MainActivity extends Activity {
 		progress.show();
 
 		final Handler handler = new Handler();
-		new Thread() {
+		Thread thread = new Thread() {
 			@Override
 			public void run() {
 				try {
@@ -365,7 +365,9 @@ public class MainActivity extends Activity {
 					}
 				});
 			}
-		}.start();
+		};
+		thread.start();
+		return thread;
 	}
 
 	private void reloadFilter(final boolean sleep) {
@@ -490,58 +492,106 @@ public class MainActivity extends Activity {
 				CsvExport csvExport = new CsvExport();
 				doExport(csvExport, newFileOutput("cwg.csv"));
 				return true;
-			case R.id.menuExportWeb:
-				try {
-					String url = settings.getString("web_export_url", "");
-					String token = settings.getString("web_export_token", "");
+			case R.id.menuExportWeb: {
+				final String url = settings.getString("web_export_url", "");
+				final String token = settings.getString("web_export_token", "");
 
-					if (url.length() == 0) {
-						Toast.makeText(this, getText(R.string.url_is_not_set),
-								Toast.LENGTH_LONG).show();
-						return true;
-					}
-
-					if (token.length() == 0) {
-						Toast.makeText(this, getText(R.string.token_is_not_set),
-								Toast.LENGTH_LONG).show();
-						return true;
-					}
-
-					ByteArrayOutputStream writer = new ByteArrayOutputStream();
-					CsvExport webExport = new CsvExport();
-					doExport(webExport, writer);
-
-					HttpClient httpClient = new DefaultHttpClient();
-					HttpPost httpPost = new HttpPost(url);
-
-					List<NameValuePair> data = new ArrayList<NameValuePair>(2);
-					data.add(new BasicNameValuePair("token", token));
-					data.add(new BasicNameValuePair("csv", writer.toString()));
-					httpPost.setEntity(new UrlEncodedFormEntity(data));
-
-					HttpResponse response = httpClient.execute(httpPost);
-					if (response.getStatusLine().getStatusCode() != 200) {
-						Header[] headers = response.getHeaders("Error");
-						if (headers.length > 0) {
-							for (Header header : response.getHeaders("Error")) {
-								Toast.makeText(this, header.getValue(), Toast.LENGTH_LONG).show();
-							}
-						} else {
-								Toast.makeText(this,
-									Integer.toString(response.getStatusLine().getStatusCode()) + " " +
-									response.getStatusLine().getReasonPhrase(),
-									Toast.LENGTH_LONG).show();
-						}
-					}
-				} catch (ClientProtocolException cpe) {
-					Toast.makeText(this, cpe.getClass().getName() + ": " + cpe.getMessage(),
+				if (url.length() == 0) {
+					Toast.makeText(this, getText(R.string.url_is_not_set),
 							Toast.LENGTH_LONG).show();
-				} catch (IOException ioe) {
-					Toast.makeText(this, ioe.getClass().getName() + ": " + ioe.getMessage(),
-							Toast.LENGTH_LONG).show();
+					return true;
 				}
 
+				if (token.length() == 0) {
+					Toast.makeText(this, getText(R.string.token_is_not_set),
+							Toast.LENGTH_LONG).show();
+					return true;
+				}
+
+				final ByteArrayOutputStream writer = new ByteArrayOutputStream();
+				CsvExport webExport = new CsvExport();
+				final Thread exportThread = doExport(webExport, writer);
+
+				final Handler handler = new Handler();
+				final ProgressDialog progress = new ProgressDialog(this);
+				progress.setIndeterminate(true);
+				progress.setCancelable(false);
+				progress.setMessage(getText(R.string.please_wait));
+				progress.setTitle(R.string.uploading);
+				new Thread() {
+					@Override
+					public void run() {
+						try {
+							synchronized (exportThread) {
+								while (exportThread.isAlive()) {
+									try {
+										exportThread.join();
+									} catch (InterruptedException ie) {}
+								}
+							}
+
+							handler.post(new Runnable() {
+								public void run() {
+									progress.show();
+								}
+							});
+
+							HttpClient httpClient = new DefaultHttpClient();
+							HttpPost httpPost = new HttpPost(url);
+
+							List<NameValuePair> data = new ArrayList<NameValuePair>(2);
+							data.add(new BasicNameValuePair("token", token));
+							data.add(new BasicNameValuePair("csv", writer.toString("UTF-8")));
+							httpPost.setEntity(new UrlEncodedFormEntity(data, "UTF-8"));
+
+							final HttpResponse response = httpClient.execute(httpPost);
+							if (response.getStatusLine().getStatusCode() != 200) {
+								final Header[] headers = response.getHeaders("Error");
+								if (headers.length > 0) {
+									for (final Header header : response.getHeaders("Error")) {
+										handler.post(new Runnable() {
+											public void run() {
+												Toast.makeText(MainActivity.this, header.getValue(), Toast.LENGTH_LONG).show();
+											}
+										});
+									}
+								} else {
+									handler.post(new Runnable() {
+										public void run() {
+											Toast.makeText(MainActivity.this,
+												Integer.toString(response.getStatusLine().getStatusCode()) + " " +
+												response.getStatusLine().getReasonPhrase(),
+												Toast.LENGTH_LONG).show();
+										}
+									});
+								}
+							}
+
+							handler.post(new Runnable() {
+								public void run() {
+									progress.dismiss();
+								}
+							});
+						} catch (final ClientProtocolException cpe) {
+							handler.post(new Runnable() {
+								public void run() {
+									Toast.makeText(MainActivity.this, cpe.getClass().getName() + ": " + cpe.getMessage(),
+											Toast.LENGTH_LONG).show();
+								}
+							});
+						} catch (final IOException ioe) {
+							handler.post(new Runnable() {
+								public void run() {
+									Toast.makeText(MainActivity.this, ioe.getClass().getName() + ": " + ioe.getMessage(),
+										Toast.LENGTH_LONG).show();
+								}
+							});
+						}
+					}
+				}.start();
+
 				return true;
+			}
 			case R.id.menuImportCsv:
 				CsvImport csvImport = new CsvImport();
 				ProgressInputStream csvIn = newFileInput("cwg.csv");
