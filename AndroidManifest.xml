@@ -21,5 +21,7 @@
 		<activity android:name=".PreferenceActivity" android:label="@string/preference_activity" />
 		<activity android:name=".StatsActivity" android:label="@string/statistics_activity" />
 		<activity android:name=".ShowActivity" android:label="@string/show_activity" />
+		<meta-data android:name="com.google.android.backup.api_key"
+			android:value="AEdPqrEAAAAICuEyNSAcBcLmmOZ27C_rAPK2HOoStt11WJcXsA" />
 	</application>
 </manifest>
