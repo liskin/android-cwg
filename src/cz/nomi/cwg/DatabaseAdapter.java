@@ -149,7 +149,7 @@ class DatabaseAdapter {
 				null,
 				null,
 				null,
-				"title, catalog_id");
+				"count > 0 DESC, title, _id");
 	}
 
 	Cursor getFilteredCwg(String title) {
@@ -203,7 +203,7 @@ class DatabaseAdapter {
 				},
 				null,
 				null,
-				"title, catalog_id");
+				"count > 0 DESC, title, _id");
 	}
 
 	void addCwg(String title, String catalogTitle, String catalogId, String jpg, int count) {
