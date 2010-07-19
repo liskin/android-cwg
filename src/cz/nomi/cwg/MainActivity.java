@@ -34,6 +34,7 @@ import android.preference.PreferenceManager;
 import android.text.ClipboardManager;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.KeyEvent;
@@ -43,6 +44,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.View.OnKeyListener;
 import android.widget.AdapterView;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.AdapterView.OnItemClickListener;
@@ -127,6 +129,16 @@ public class MainActivity extends Activity {
 	private Thread filterThread;
 	private SharedPreferences settings;
 
+	private void addCwgBySearch() {
+		String title = search.getText().toString().trim();
+		if (title.length() > 0) {
+			db.addCwg(title, null, null, null, 1);
+			listCursor.requery();
+			listAdapter.notifyDataSetInvalidated();
+			listAdapter.notifyDataSetChanged();
+		}
+	}
+
 	@Override
 	public void onCreate(Bundle icicle) {
 		super.onCreate(icicle);
@@ -178,17 +190,22 @@ public class MainActivity extends Activity {
 				reloadFilter(true);
 			}
 		});
+		search.setOnKeyListener(new OnKeyListener() {
+			public boolean onKey(View v, int keyCode, KeyEvent event) {
+				if (event.getAction() == KeyEvent.ACTION_DOWN &&
+						keyCode == KeyEvent.KEYCODE_ENTER) {
+					addCwgBySearch();
+					return true;
+				} else {
+					return false;
+				}
+			}
+		});
 
 		// Add title
 		button.setOnClickListener(new OnClickListener() {
 			public void onClick(View arg0) {
-				String title = search.getText().toString().trim();
-				if (title.length() > 0) {
-					db.addCwg(title, null, null, null, 1);
-					listCursor.requery();
-					listAdapter.notifyDataSetInvalidated();
-					listAdapter.notifyDataSetChanged();
-				}
+				addCwgBySearch();
 			}
 		});
 
