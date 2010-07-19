@@ -17,6 +17,7 @@
 
 package cz.nomi.cwg;
 
+import android.database.Cursor;
 import android.util.Log;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -97,7 +98,15 @@ class CsvImport extends Import {
 							}
 							try {
 								int countI = Integer.parseInt(count);
-								db.addCwg(title, catalogTitle, catalogId, jpg, countI);
+
+								Cursor cur = db.getCwgByCatalogId(catalogId);
+								if (cur == null) {
+									db.addCwg(title, catalogTitle, catalogId, jpg, countI);
+								} else {
+									long id = cur.getLong(cur.getColumnIndex("_id"));
+									db.updateCwg(id, title, catalogTitle, catalogId, jpg, countI);
+									cur.close();
+								}
 							} catch (NumberFormatException nfe) {
 								Log.d(TAG, "Count is not number, skipping:"
 										+ " count=" + count);
