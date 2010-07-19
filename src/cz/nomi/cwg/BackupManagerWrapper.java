@@ -17,22 +17,16 @@
 
 package cz.nomi.cwg;
 
-import android.os.Bundle;
-
-public class PreferenceActivity extends android.preference.PreferenceActivity {
-	private DatabaseAdapter db;
-
-	@Override
-    public void onCreate(Bundle icicle) {
-        super.onCreate(icicle);
-
-		addPreferencesFromResource(R.xml.preference);
+public class BackupManagerWrapper {
+	static {
+		try {
+			Class.forName("android.app.backup.BackupManager");
+		} catch (Exception ex) {
+			throw new RuntimeException(ex);
+		}
 	}
 
-	@Override
-	public void onPause() {
-		super.onPause();
-
-		BackupManager.dataChanged(PreferenceActivity.this);
+	protected static void dataChanged(String packageName) {
+		android.app.backup.BackupManager.dataChanged(packageName);
 	}
 }

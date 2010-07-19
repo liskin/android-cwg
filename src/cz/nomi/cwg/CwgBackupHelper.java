@@ -177,7 +177,7 @@ public class CwgBackupHelper implements BackupHelper {
 				StringTokenizerWithEmpty st =
 						new StringTokenizerWithEmpty(new String(dataUn, 1, dataUn.length - 1), DELIMITER);
 
-				BackupAgentWrapper.disableBackup();
+				BackupManager.disableBackup();
 				while (st.hasMoreTokens()) {
 					String title = st.nextToken();
 					if (title.length() == 0) {
@@ -199,7 +199,7 @@ public class CwgBackupHelper implements BackupHelper {
 
 					db.addCwg(title, catalogTitle, catalogId, jpg, count);
 				}
-				BackupAgentWrapper.enableBackup();
+				BackupManager.enableBackup();
 			} else {
 				Log.e(TAG, "Unknown backup version, ignoring");
 			}

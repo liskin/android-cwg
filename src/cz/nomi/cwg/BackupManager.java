@@ -20,18 +20,18 @@ package cz.nomi.cwg;
 import android.content.Context;
 import android.util.Log;
 
-public class BackupAgentWrapper {
+public class BackupManager {
 	private static final String TAG = "CwgBackupAgentWrapper";
 	private static boolean backupAvailable = true;
 	private static boolean backupEnabled = true;
 
 	protected static void enableBackup() {
-		BackupAgentWrapper.backupEnabled = true;
+		BackupManager.backupEnabled = true;
 		Log.d(TAG, "Enabling backup");
 	}
 
 	protected static void disableBackup() {
-		BackupAgentWrapper.backupEnabled = false;
+		BackupManager.backupEnabled = false;
 		Log.d(TAG, "Disabling backup");
 	}
 
@@ -39,17 +39,17 @@ public class BackupAgentWrapper {
 		if (!backupEnabled) {
 			return;
 		}
-		if (BackupAgentWrapper.backupAvailable) {
+		if (BackupManager.backupAvailable) {
 			// Test if android.app.backup.BackupAgent class exists
 			try {
 				Class.forName("android.app.backup.BackupManager");
 			} catch (Exception ex) {
 				Log.d(TAG, "BackupManager is not available");
-				BackupAgentWrapper.backupAvailable = false;
+				BackupManager.backupAvailable = false;
 				return;
 			}
 
-			android.app.backup.BackupManager.dataChanged(context.getPackageName());
+			BackupManagerWrapper.dataChanged(context.getPackageName());
 		}
 	}
 }
