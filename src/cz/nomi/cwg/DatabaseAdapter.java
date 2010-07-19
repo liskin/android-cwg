@@ -145,7 +145,7 @@ class DatabaseAdapter {
 					"catalog_id",
 					"jpg",
 					"count"},
-				"catalog_id IS NULL",
+				"_id IN (SELECT _id FROM cwg WHERE catalog_id IS NULL)",
 				null,
 				null,
 				null,
@@ -197,7 +197,7 @@ class DatabaseAdapter {
 					"catalog_id",
 					"jpg",
 					"count"},
-				"catalog_id IS NULL AND title LIKE '%' || ? || '%'",
+				"_id IN (SELECT _id FROM cwg WHERE catalog_id IS NULL) AND title LIKE '%' || ? || '%'",
 				new String[]{
 					title
 				},
