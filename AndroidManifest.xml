@@ -11,7 +11,7 @@
 		android:normalScreens="true"
 		android:largeScreens="true"
 		android:anyDensity="true" />
-	<application android:icon="@drawable/icon" android:label="@string/app_name">
+	<application android:icon="@drawable/icon" android:label="@string/app_name" android:backupAgent=".CwgBackupAgent">
 		<activity android:name=".MainActivity" android:label="@string/main_activity">
 			<intent-filter>
 				<action android:name="android.intent.action.MAIN"/>

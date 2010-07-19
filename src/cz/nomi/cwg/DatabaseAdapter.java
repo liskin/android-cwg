@@ -215,13 +215,13 @@ class DatabaseAdapter {
 		val.put("count", count);
 		db.insertOrThrow("cwg", null, val);
 
-		return;
+		BackupAgentWrapper.dataChanged(this.context);
 	}
 
 	void deleteCwg(long id) {
 		db.delete("cwg", "_id = " + id, null);
 
-		return;
+		BackupAgentWrapper.dataChanged(this.context);
 	}
 
 	void updateCwg(long id, String title, String catalogTitle,
@@ -233,10 +233,14 @@ class DatabaseAdapter {
 		val.put("jpg", jpg);
 		val.put("count", count);
 		db.update("cwg", val, "_id = " + id, null);
+
+		BackupAgentWrapper.dataChanged(this.context);
 	}
 
 	void incCwg(long id) {
 		db.execSQL("UPDATE cwg SET count = count + 1 WHERE _id = " + id);
+
+		BackupAgentWrapper.dataChanged(this.context);
 	}
 
 	void decCwg(long id) {
@@ -260,6 +264,8 @@ class DatabaseAdapter {
 		if (mCursor.getInt(0) > 0) {
 			// Update
 			db.execSQL("UPDATE cwg SET count = count - 1 WHERE _id = " + id);
+
+			BackupAgentWrapper.dataChanged(this.context);
 		} else {
 			Toast.makeText(context, context.getText(R.string.cant_remove_zero),
 				Toast.LENGTH_LONG).show();
@@ -310,6 +316,8 @@ class DatabaseAdapter {
 		updateCwg(id1, title, catalogTitle, catalogId, jpg, count);
 
 		endTransaction();
+
+		BackupAgentWrapper.dataChanged(this.context);
 	}
 
 	void autoMergeCwg() {
@@ -332,6 +340,9 @@ class DatabaseAdapter {
 			if (mCursor.getCount() == 0) {
 				mCursor.close();
 				endTransaction();
+
+				BackupAgentWrapper.dataChanged(this.context);
+
 				return;
 			}
 			mCursor.moveToFirst();
@@ -342,6 +353,8 @@ class DatabaseAdapter {
 
 	void eraseDb() {
 		db.delete("cwg", null, null);
+
+		BackupAgentWrapper.dataChanged(this.context);
 	}
 
 	int countCwgSumCount() {

@@ -17,22 +17,21 @@
 
 package cz.nomi.cwg;
 
-import android.os.Bundle;
+import android.app.backup.BackupAgentHelper;
+import android.app.backup.SharedPreferencesBackupHelper;
 
-public class PreferenceActivity extends android.preference.PreferenceActivity {
-	private DatabaseAdapter db;
-
+public class CwgBackupAgent extends BackupAgentHelper {
 	@Override
-    public void onCreate(Bundle icicle) {
-        super.onCreate(icicle);
+    public void onCreate() {
+		// Preferences
+		SharedPreferencesBackupHelper prefs =
+			new SharedPreferencesBackupHelper(this,
+			getPackageName() + "_preferences");
+		addHelper("prefs", prefs);
 
-		addPreferencesFromResource(R.xml.preference);
-	}
-
-	@Override
-	public void onPause() {
-		super.onPause();
-
-		BackupAgentWrapper.dataChanged(PreferenceActivity.this);
-	}
+		// CWGs
+		CwgBackupHelper cwgs =
+			new CwgBackupHelper(this);
+		addHelper("cwgs", cwgs);
+    }
 }
