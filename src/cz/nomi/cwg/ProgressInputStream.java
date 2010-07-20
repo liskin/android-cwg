@@ -30,23 +30,32 @@ class ProgressInputStream extends BufferedInputStream {
 	private ProgressDialog dialog;
 	private Handler handler;
 
-	public ProgressInputStream(Context context, InputStream in, long size) {
+	public ProgressInputStream(Context context, Handler handler, InputStream in, final long size) {
 		super(in);
 
 		this.context = context;
-		dialog = new ProgressDialog(context);
-		dialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-		dialog.setTitle(R.string.importing);
-		dialog.setMessage(context.getText(R.string.please_wait));
-		dialog.setCancelable(false);
-		dialog.setMax((int) size);
-		dialog.show();
-
-		handler = new Handler();
+		this.handler = handler;
+		handler.post(new Runnable() {
+			public void run() {
+				dialog = new ProgressDialog(ProgressInputStream.this.context);
+				dialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+				dialog.setTitle(R.string.importing);
+				dialog.setMessage(ProgressInputStream.this.context.getText(R.string.please_wait));
+				dialog.setCancelable(false);
+				dialog.setMax((int) size);
+				dialog.show();
+			}
+		});
 	}
 
 	private void updateDialog() {
-		dialog.setProgress((int) readed);
+		handler.post(new Runnable() {
+			public void run() {
+				if (dialog != null) {
+					dialog.setProgress((int) readed);
+				}
+			}
+		});
 	}
 
 	@Override
@@ -70,7 +79,9 @@ class ProgressInputStream extends BufferedInputStream {
 	public synchronized void close() throws IOException {
 		handler.post(new Runnable() {
 			public void run() {
-				dialog.dismiss();
+				if (dialog != null) {
+					dialog.dismiss();
+				}
 			}
 		});
 

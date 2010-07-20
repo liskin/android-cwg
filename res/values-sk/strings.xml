@@ -60,6 +60,8 @@
 	<string name="catalog_cwg">CWG v katalógu:</string>
 	<string name="importing">Importujem</string>
 	<string name="exporting">Exportujem</string>
+	<string name="export_finished">Export dokončený</string>
+	<string name="import_finished">Import dokončený</string>
 	<string name="uploading">Odesílám</string>
 	<string name="please_wait">Prosím čakajte...</string>
 	<string name="title">Názov:</string>

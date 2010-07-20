@@ -68,6 +68,8 @@
 	<string name="importing">Importing</string>
 	<string name="exporting">Exporting</string>
 	<string name="uploading">Uploading</string>
+	<string name="export_finished">Export finished</string>
+	<string name="import_finished">Import finished</string>
 	<string name="please_wait">Please wait...</string>
 	<string name="title">Title:</string>
 	<string name="catalog_title">Catalog title:</string>

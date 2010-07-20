@@ -25,17 +25,17 @@ public class BackupManager {
 	private static boolean backupAvailable = true;
 	private static boolean backupEnabled = true;
 
-	protected static void enableBackup() {
+	static void enableBackup() {
 		BackupManager.backupEnabled = true;
 		Log.d(TAG, "Enabling backup");
 	}
 
-	protected static void disableBackup() {
+	static void disableBackup() {
 		BackupManager.backupEnabled = false;
 		Log.d(TAG, "Disabling backup");
 	}
 
-	protected static void dataChanged(Context context) {
+	static void dataChanged(Context context) {
 		if (!BackupManager.backupEnabled) {
 			return;
 		}

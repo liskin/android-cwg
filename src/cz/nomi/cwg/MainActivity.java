@@ -262,7 +262,7 @@ public class MainActivity extends Activity {
 		}
 	}
 
-	private ProgressInputStream newFileInput(String fileName) {
+	private ProgressInputStream newFileInput(Handler handler, String fileName) {
 		File file = Storage.getFile(fileName);
 		if (file == null) {
 			Toast.makeText(MainActivity.this, getText(R.string.cant_open_external_storage),
@@ -272,6 +272,7 @@ public class MainActivity extends Activity {
 			try {
 				return new ProgressInputStream(
 						this,
+						handler,
 						new FileInputStream(file),
 						file.length());
 			} catch (FileNotFoundException fnfe) {
@@ -283,116 +284,101 @@ public class MainActivity extends Activity {
 		}
 	}
 
-	private void doImport(final Import importer, final ProgressInputStream input) {
+	private void doImport(final Handler handler, final Import importer, final ProgressInputStream input) {
 		if (input == null) {
 			return;
 		}
-		final Handler handler = new Handler();
-		new Thread() {
-			@Override
-			public void run() {
-				db.beginTransaction();
-				importer.setInput(input);
+
+		db.beginTransaction();
+		importer.setInput(input);
 				
-				try {
-					importer.importData(db);
-					db.endTransaction();
-				} catch (final SQLiteConstraintException se) {
-					db.rollback();
-					Log.e(TAG, se.getClass().getName() + ": " + se.getMessage());
-					handler.post(new Runnable() {
-						public void run() {
-							Toast.makeText(MainActivity.this,
-									getText(R.string.cant_import_duplicity),
-									Toast.LENGTH_LONG).show();
-						}
-					});
-				} catch (final ImportException ie) {
-					db.rollback();
-					Log.e(TAG, ie.getClass().getName() + ": " + ie.getMessage());
-					handler.post(new Runnable() {
-						public void run() {
-							Toast.makeText(MainActivity.this, ie.getLocalizedMessage(),
-									Toast.LENGTH_LONG).show();
-						}
-					});
+		try {
+			importer.importData(db);
+			db.endTransaction();
+		} catch (final SQLiteConstraintException se) {
+			db.rollback();
+			Log.e(TAG, se.getClass().getName() + ": " + se.getMessage());
+			handler.post(new Runnable() {
+				public void run() {
+					Toast.makeText(MainActivity.this,
+							getText(R.string.cant_import_duplicity),
+							Toast.LENGTH_LONG).show();
 				}
-
-				try {
-					input.close();
-				} catch (final IOException ioe) {
-					Log.e(TAG, ioe.getClass().getName() + ": " + ioe.getMessage());
-					handler.post(new Runnable() {
-						public void run() {
-							Toast.makeText(MainActivity.this, ioe.getClass().getName() +
-								": " + ioe.getLocalizedMessage(),	Toast.LENGTH_LONG).show();
-						}
-					});
+			});
+		} catch (final ImportException ie) {
+			db.rollback();
+			Log.e(TAG, ie.getClass().getName() + ": " + ie.getMessage());
+			handler.post(new Runnable() {
+				public void run() {
+					Toast.makeText(MainActivity.this, ie.getLocalizedMessage(),
+							Toast.LENGTH_LONG).show();
 				}
+			});
+		}
 
-				handler.post(new Runnable() {
-					public void run() {
-						listCursor.requery();
-						listAdapter.notifyDataSetInvalidated();
-						listAdapter.notifyDataSetChanged();
-					}
-				});
+		try {
+			input.close();
+		} catch (final IOException ioe) {
+			Log.e(TAG, ioe.getClass().getName() + ": " + ioe.getMessage());
+			handler.post(new Runnable() {
+				public void run() {
+					Toast.makeText(MainActivity.this, ioe.getClass().getName() +
+						": " + ioe.getLocalizedMessage(),	Toast.LENGTH_LONG).show();
+				}
+			});
+		}
+
+		handler.post(new Runnable() {
+			public void run() {
+				listCursor.requery();
+				listAdapter.notifyDataSetInvalidated();
+				listAdapter.notifyDataSetChanged();
 			}
-		}.start();
+		});
 	}
 
-	private Thread doExport(final Export exporter, final OutputStream output) {
+	private void doExport(final Handler handler, final Export exporter, final OutputStream output) {
 		if (output == null) {
-			return null;
+			return;
 		}
-		final ProgressDialog progress = new ProgressDialog(this);
-		progress.setIndeterminate(true);
-		progress.setCancelable(false);
-		progress.setMessage(getText(R.string.please_wait));
-		progress.setTitle(R.string.exporting);
-		progress.show();
 
-		final Handler handler = new Handler();
-		Thread thread = new Thread() {
-			@Override
+		final OutputProgressDialog progress = new OutputProgressDialog(this, handler);
+
+		try {
+			exporter.setOutput(output);
+			exporter.exportData(db.getAllCwg());
+		} catch (final ExportException ioe) {
+			Log.e(TAG, ioe.getClass().getName() + ": " + ioe.getMessage());
+			handler.post(new Runnable() {
+				public void run() {
+					progress.dismiss();
+					Toast.makeText(MainActivity.this, ioe.getLocalizedMessage(),
+						Toast.LENGTH_LONG).show();
+				}
+			});
+		}
+
+		try {
+			output.close();
+		} catch (final IOException ioe) {
+			Log.e(TAG, ioe.getClass().getName() + ": " + ioe.getMessage());
+			handler.post(new Runnable() {
+				public void run() {
+					progress.dismiss();
+					Toast.makeText(MainActivity.this, ioe.getClass().getName() +
+						": " + ioe.getLocalizedMessage(),	Toast.LENGTH_LONG).show();
+				}
+			});
+		}
+
+		handler.post(new Runnable() {
 			public void run() {
-				try {
-					exporter.setOutput(output);
-					exporter.exportData(db.getAllCwg());
-				} catch (final ExportException ioe) {
-					Log.e(TAG, ioe.getClass().getName() + ": " + ioe.getMessage());
-					handler.post(new Runnable() {
-						public void run() {
-							Toast.makeText(MainActivity.this, ioe.getLocalizedMessage(),
-								Toast.LENGTH_LONG).show();
-						}
-					});
-				}
-
-				try {
-					output.close();
-				} catch (final IOException ioe) {
-					Log.e(TAG, ioe.getClass().getName() + ": " + ioe.getMessage());
-					handler.post(new Runnable() {
-						public void run() {
-							Toast.makeText(MainActivity.this, ioe.getClass().getName() +
-								": " + ioe.getLocalizedMessage(),	Toast.LENGTH_LONG).show();
-						}
-					});
-				}
-
-				handler.post(new Runnable() {
-					public void run() {
-						listCursor.requery();
-						listAdapter.notifyDataSetInvalidated();
-						listAdapter.notifyDataSetChanged();
-						progress.dismiss();
-					}
-				});
+				listCursor.requery();
+				listAdapter.notifyDataSetInvalidated();
+				listAdapter.notifyDataSetChanged();
+				progress.dismiss();
 			}
-		};
-		thread.start();
-		return thread;
+		});
 	}
 
 	private void reloadFilter(final boolean sleep) {
@@ -491,6 +477,7 @@ public class MainActivity extends Activity {
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
+		final Handler handler = new Handler();
 		switch (item.getItemId()) {
 			case R.id.menuAll:
 				this.mode = Mode.NORMAL;
@@ -505,17 +492,50 @@ public class MainActivity extends Activity {
 				reloadMode();
 				return true;
 			case R.id.menuExportText:
-				TextExport textExport = new TextExport();
-				doExport(textExport, newFileOutput("cwg.txt"));
+				new Thread() {
+					@Override
+					public void run() {
+						doExport(handler, new TextExport(), newFileOutput("cwg.txt"));
+						handler.post(new Runnable() {
+							public void run() {
+								Toast.makeText(MainActivity.this,
+									R.string.export_finished,
+									Toast.LENGTH_SHORT).show();
+							}
+						});
+					}
+				}.start();
 				return true;
-			case R.id.menuImportText:
-				TextImport textImport = new TextImport();
-				ProgressInputStream textIn = newFileInput("cwg.txt");
-				doImport(textImport, textIn);
+			case R.id.menuImportText: {
+				new Thread() {
+					@Override
+					public void run() {
+						doImport(handler, new TextImport(), newFileInput(handler, "cwg.txt"));
+						handler.post(new Runnable() {
+							public void run() {
+								Toast.makeText(MainActivity.this,
+									R.string.import_finished,
+									Toast.LENGTH_SHORT).show();
+							}
+						});
+					}
+				}.start();
 				return true;
+			}
 			case R.id.menuExportCsv:
-				CsvExport csvExport = new CsvExport();
-				doExport(csvExport, newFileOutput("cwg.csv"));
+				new Thread() {
+					@Override
+					public void run() {
+						doExport(handler, new CsvExport(), newFileOutput("cwg.csv"));
+						handler.post(new Runnable() {
+							public void run() {
+								Toast.makeText(MainActivity.this,
+										R.string.export_finished,
+										Toast.LENGTH_SHORT).show();
+							}
+						});
+					}
+				}.start();
 				return true;
 			case R.id.menuExportWeb: {
 				final String url = settings.getString("web_export_url", "");
@@ -533,11 +553,7 @@ public class MainActivity extends Activity {
 					return true;
 				}
 
-				final ByteArrayOutputStream writer = new ByteArrayOutputStream();
-				CsvExport webExport = new CsvExport();
-				final Thread exportThread = doExport(webExport, writer);
 
-				final Handler handler = new Handler();
 				final ProgressDialog progress = new ProgressDialog(this);
 				progress.setIndeterminate(true);
 				progress.setCancelable(false);
@@ -547,13 +563,9 @@ public class MainActivity extends Activity {
 					@Override
 					public void run() {
 						try {
-							synchronized (exportThread) {
-								while (exportThread.isAlive()) {
-									try {
-										exportThread.join();
-									} catch (InterruptedException ie) {}
-								}
-							}
+							final ByteArrayOutputStream writer = new ByteArrayOutputStream();
+							CsvExport webExport = new CsvExport();
+							doExport(handler, webExport, writer);
 
 							handler.post(new Runnable() {
 								public void run() {
@@ -595,6 +607,9 @@ public class MainActivity extends Activity {
 							handler.post(new Runnable() {
 								public void run() {
 									progress.dismiss();
+									Toast.makeText(MainActivity.this,
+										R.string.export_finished,
+										Toast.LENGTH_SHORT).show();
 								}
 							});
 						} catch (final ClientProtocolException cpe) {
@@ -619,42 +634,69 @@ public class MainActivity extends Activity {
 
 				return true;
 			}
-			case R.id.menuImportCsv:
-				CsvImport csvImport = new CsvImport();
-				ProgressInputStream csvIn = newFileInput("cwg.csv");
-				doImport(csvImport, csvIn);
-				return true;
-			case R.id.menuImportCatalog:
-				try {
-					boolean catalogUseZip = settings.getBoolean("catalog_use_zip",
-							getText(R.string.pref_catalog_use_zip).equals("true"));
-					InputStream input;
-					long length;
-					if (catalogUseZip) {
-						String catalogZipUrl = settings.getString("catalog_zip_url",
-							getText(R.string.pref_catalog_zip_url).toString());
-						URL url = new URL(catalogZipUrl);
-						HttpURLConnection http = (HttpURLConnection) url.openConnection();
-						ZipInputStream zip = new ZipInputStream(http.getInputStream());
-						input = zip;
-						length = zip.getNextEntry().getSize();
-					} else {
-						String catalogUrl = settings.getString("catalog_url",
-							getText(R.string.pref_catalog_url).toString());
-
-						URL url = new URL(catalogUrl);
-						HttpURLConnection http = (HttpURLConnection) url.openConnection();
-						input = http.getInputStream();
-						length = http.getContentLength();
+			case R.id.menuImportCsv: {
+				new Thread() {
+					@Override
+					public void run() {
+						doImport(handler, new CsvImport(), newFileInput(handler, "cwg.csv"));
+						handler.post(new Runnable() {
+							public void run() {
+								Toast.makeText(MainActivity.this,
+									R.string.import_finished,
+									Toast.LENGTH_SHORT).show();
+							}
+						});
 					}
-					CatalogImport catalogImport = new CatalogImport();
-					doImport(catalogImport, new ProgressInputStream(this,
-						input, length));
-				} catch (IOException ioe) {
-					Log.e(TAG, ioe.getClass().getName() + ": " + ioe.getMessage());
-					Toast.makeText(this, ioe.getClass().getName() + ": " + ioe.getLocalizedMessage(),
-							Toast.LENGTH_LONG).show();
-				}
+				}.start();
+				return true;
+			}
+			case R.id.menuImportCatalog:
+				new Thread() {
+					@Override
+					public void run() {
+						try {
+							boolean catalogUseZip = settings.getBoolean("catalog_use_zip",
+									getText(R.string.pref_catalog_use_zip).equals("true"));
+							InputStream input;
+							long length;
+							if (catalogUseZip) {
+								String catalogZipUrl = settings.getString("catalog_zip_url",
+									getText(R.string.pref_catalog_zip_url).toString());
+								URL url = new URL(catalogZipUrl);
+								HttpURLConnection http = (HttpURLConnection) url.openConnection();
+								ZipInputStream zip = new ZipInputStream(http.getInputStream());
+								input = zip;
+								length = zip.getNextEntry().getSize();
+							} else {
+								String catalogUrl = settings.getString("catalog_url",
+									getText(R.string.pref_catalog_url).toString());
+
+								URL url = new URL(catalogUrl);
+								HttpURLConnection http = (HttpURLConnection) url.openConnection();
+								input = http.getInputStream();
+								length = http.getContentLength();
+							}
+							doImport(handler, new CatalogImport(), new ProgressInputStream(MainActivity.this,
+								handler, input, length));
+							handler.post(new Runnable() {
+								public void run() {
+									Toast.makeText(MainActivity.this,
+										R.string.import_finished,
+										Toast.LENGTH_SHORT).show();
+								}
+							});
+						} catch (final IOException ioe) {
+							Log.e(TAG, ioe.getClass().getName() + ": " + ioe.getMessage());
+							handler.post(new Runnable() {
+								public void run() {
+									Toast.makeText(MainActivity.this,
+										ioe.getClass().getName() + ": " + ioe.getLocalizedMessage(),
+										Toast.LENGTH_LONG).show();
+								}
+							});
+						}
+					}
+				}.start();
 				return true;
 			case R.id.menuStatistics:
 				this.startActivity(new Intent(this, StatsActivity.class));
@@ -670,7 +712,6 @@ public class MainActivity extends Activity {
 				progress.setTitle(R.string.auto_merging);
 				progress.show();
 
-				final Handler handler = new Handler();
 				new Thread() {
 					@Override
 					public void run() {

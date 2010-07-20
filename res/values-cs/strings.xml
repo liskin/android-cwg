@@ -61,6 +61,8 @@
 	<string name="importing">Importuji</string>
 	<string name="exporting">Exportuji</string>
 	<string name="uploading">Odesílám</string>
+	<string name="export_finished">Export dokončen</string>
+	<string name="import_finished">Import dokončen</string>
 	<string name="please_wait">Prosím čekejte...</string>
 	<string name="title">Název:</string>
 	<string name="catalog_title">Název dle katalogu:</string>

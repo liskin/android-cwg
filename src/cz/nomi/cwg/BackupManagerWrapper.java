@@ -26,7 +26,7 @@ public class BackupManagerWrapper {
 		}
 	}
 
-	protected static void dataChanged(String packageName) {
+	static void dataChanged(String packageName) {
 		android.app.backup.BackupManager.dataChanged(packageName);
 	}
 }
