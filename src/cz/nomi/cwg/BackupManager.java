@@ -42,7 +42,7 @@ public class BackupManager {
 		if (BackupManager.backupAvailable) {
 			try {
 				BackupManagerWrapper.dataChanged(context.getPackageName());
-			} catch (RuntimeException re) {
+			} catch (Throwable t) {
 				Log.d(TAG, "BackupManager is not available");
 				BackupManager.backupAvailable = false;
 			}
