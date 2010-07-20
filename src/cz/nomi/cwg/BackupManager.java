@@ -36,20 +36,16 @@ public class BackupManager {
 	}
 
 	protected static void dataChanged(Context context) {
-		if (!backupEnabled) {
+		if (!BackupManager.backupEnabled) {
 			return;
 		}
 		if (BackupManager.backupAvailable) {
-			// Test if android.app.backup.BackupAgent class exists
 			try {
-				Class.forName("android.app.backup.BackupManager");
-			} catch (Exception ex) {
+				BackupManagerWrapper.dataChanged(context.getPackageName());
+			} catch (RuntimeException re) {
 				Log.d(TAG, "BackupManager is not available");
 				BackupManager.backupAvailable = false;
-				return;
 			}
-
-			BackupManagerWrapper.dataChanged(context.getPackageName());
 		}
 	}
 }
