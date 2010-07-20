@@ -48,7 +48,10 @@ class CsvExport extends Export {
 						buffer.toString().getBytes("UTF-8"));
 			}
 		} catch (IOException ioe) {
-			throw new ExportException(ioe.getClass().getName() + ": " + ioe.getMessage(), ioe);
+			throw new ExportException(
+					ioe.getClass().getName() + ": " + ioe.getMessage(),
+					ioe.getClass().getName() + ": " + ioe.getLocalizedMessage(),
+					ioe);
 		}
 	}
 }

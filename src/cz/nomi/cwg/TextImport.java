@@ -37,7 +37,10 @@ class TextImport extends Import {
 				}
 			}
 		} catch (IOException ioe) {
-			throw new ImportException(ioe.getClass().getName() + ": " + ioe.getMessage(), ioe);
+			throw new ImportException(
+					ioe.getClass().getName() + ": " + ioe.getMessage(),
+					ioe.getClass().getName() + ": " + ioe.getLocalizedMessage(),
+					ioe);
 		}
 	}
 }

@@ -114,12 +114,14 @@ class CsvImport extends Import {
 						}
 						break;
 					default:
-						Log.e(TAG, "Unknown CSV version");
-						break;
+						throw new ImportException("Unknown CSV format");
 				}
 			}
 		} catch (IOException ioe) {
-			throw new ImportException(ioe.getClass().getName() + ": " + ioe.getMessage(), ioe);
+			throw new ImportException(
+					ioe.getClass().getName() + ": " + ioe.getMessage(),
+					ioe.getClass().getName() + ": " + ioe.getLocalizedMessage(),
+					ioe);
 		}
 	}
 }

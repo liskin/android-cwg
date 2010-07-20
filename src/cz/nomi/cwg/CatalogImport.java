@@ -136,11 +136,20 @@ class CatalogImport extends Import {
 			CatalogHandler handler = new CatalogHandler(db);
 			parser.parse(this.getInput(), handler);
 		} catch (ParserConfigurationException pce) {
-			throw new ImportException(pce.getClass().getName() + ": " + pce.getMessage(), pce);
+			throw new ImportException(
+					pce.getClass().getName() + ": " + pce.getMessage(),
+					pce.getClass().getName() + ": " + pce.getLocalizedMessage(),
+					pce);
 		} catch (SAXException saxe) {
-			throw new ImportException(saxe.getClass().getName() + ": " + saxe.getMessage(), saxe);
+			throw new ImportException(
+					saxe.getClass().getName() + ": " + saxe.getMessage(),
+					saxe.getClass().getName() + ": " + saxe.getLocalizedMessage(),
+					saxe);
 		} catch (IOException ioe) {
-			throw new ImportException(ioe.getClass().getName() + ": " + ioe.getMessage(), ioe);
+			throw new ImportException(
+					ioe.getClass().getName() + ": " + ioe.getMessage(),
+					ioe.getClass().getName() + ": " + ioe.getLocalizedMessage(),
+					ioe);
 		}
 	}
 }

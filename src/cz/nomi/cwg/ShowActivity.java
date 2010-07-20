@@ -28,6 +28,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.text.ClipboardManager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -50,6 +51,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 public class ShowActivity extends Activity {
+	private static final String TAG = "CwgShowActivity";
 	private DatabaseAdapter db;
 	private long cwgId;
 	private String jpg;
@@ -128,23 +130,25 @@ public class ShowActivity extends Activity {
 						}
 					});
 				} catch (final MalformedURLException mue) {
+					Log.e(TAG, mue.getClass().getName() + ": " + mue.getMessage());
 					handler.post(new Runnable() {
 						public void run() {
 							image.setImageDrawable(imageDownload);
 							imageProgress.setVisibility(View.GONE);
 							image.setVisibility(View.VISIBLE);
 							Toast.makeText(ShowActivity.this, mue.getClass().getName() +
-								": " + mue.getMessage(), Toast.LENGTH_LONG).show();
+								": " + mue.getLocalizedMessage(), Toast.LENGTH_LONG).show();
 						}
 					});
 				} catch (final IOException ioe) {
+					Log.e(TAG, ioe.getClass().getName() + ": " + ioe.getMessage());
 					handler.post(new Runnable() {
 						public void run() {
 							image.setImageDrawable(imageDownload);
 							imageProgress.setVisibility(View.GONE);
 							image.setVisibility(View.VISIBLE);
 							Toast.makeText(ShowActivity.this, ioe.getClass().getName() +
-								": " + ioe.getMessage(), Toast.LENGTH_LONG).show();
+								": " + ioe.getLocalizedMessage(), Toast.LENGTH_LONG).show();
 						}
 					});
 				}

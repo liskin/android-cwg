@@ -18,11 +18,28 @@
 package cz.nomi.cwg;
 
 public class ExportException extends Exception {
+	private String localizedMessage = null;
+
 	public ExportException(String message) {
 		super(message);
 	}
 
 	public ExportException(String message, Throwable cause) {
 		super(message, cause);
+	}
+
+	public ExportException(String message, String localizedMessage, Throwable cause) {
+		super(message, cause);
+
+		this.localizedMessage = localizedMessage;
+	}
+
+	@Override
+	public String getLocalizedMessage() {
+		if (this.localizedMessage == null) {
+			return getMessage();
+		} else {
+			return this.localizedMessage;
+		}
 	}
 }

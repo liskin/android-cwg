@@ -105,7 +105,7 @@ public class CwgBackupHelper implements BackupHelper {
 			}
 			gzip.finish();
 		} catch (IOException ioe) {
-			Log.e(TAG, "Couldn't compress the CWG:\n" + ioe);
+			Log.e(TAG, "Couldn't compress the CWG:\n" + ioe.getClass().getName() + ": " + ioe.getMessage());
 			return EMPTY_DATA;
 		} finally {
 			cursor.close();
@@ -145,7 +145,7 @@ public class CwgBackupHelper implements BackupHelper {
 			dataOutput.writeLong(newSumL);
 			dataOutput.close();
 		} catch (IOException ioe) {
-			Log.e(TAG, ioe.toString());
+			Log.e(TAG, ioe.getClass().getName() + ": " + ioe.getMessage());
 		}
 	}
 
@@ -166,7 +166,7 @@ public class CwgBackupHelper implements BackupHelper {
 				gzip.close();
 				dataUn = baos.toByteArray();
 			} catch (IOException ioe) {
-				Log.e(TAG, "Couldn't read and uncompress entity data:\n" + ioe);
+				Log.e(TAG, "Couldn't read and uncompress entity data:\n" + ioe.getClass().getName() + ": " + ioe.getMessage());
 				return;
 			}
 

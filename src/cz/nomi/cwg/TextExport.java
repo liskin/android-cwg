@@ -34,7 +34,10 @@ class TextExport extends Export {
 					.getBytes("UTF-8"));
 			}
 		} catch (IOException ioe) {
-			throw new ExportException(ioe.getClass().getName() + ": " + ioe.getMessage(), ioe);
+			throw new ExportException(
+					ioe.getClass().getName() + ": " + ioe.getMessage(),
+					ioe.getClass().getName() + ": " + ioe.getLocalizedMessage(),
+					ioe);
 		}
 	}
 }

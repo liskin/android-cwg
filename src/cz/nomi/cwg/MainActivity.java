@@ -119,6 +119,7 @@ public class MainActivity extends Activity {
 	private enum Mode {
 		NORMAL, DUPLICITY, WITHOUT_CATALOG;
 	}
+	private static final String TAG = "CwgMainActivity";
 	private DatabaseAdapter db;
 	private SimpleCursorAdapter listAdapter;
 	private Cursor listCursor;
@@ -253,8 +254,9 @@ public class MainActivity extends Activity {
 			try {
 				return new FileOutputStream(file);
 			} catch (FileNotFoundException fnfe) {
+				Log.e(TAG, fnfe.getClass().getName() + ": " + fnfe.getMessage());
 				Toast.makeText(MainActivity.this, getText(R.string.cant_open_file) +
-					" " + fnfe.getMessage(), Toast.LENGTH_LONG).show();
+					" " + fnfe.getLocalizedMessage(), Toast.LENGTH_LONG).show();
 				return null;
 			}
 		}
@@ -273,8 +275,9 @@ public class MainActivity extends Activity {
 						new FileInputStream(file),
 						file.length());
 			} catch (FileNotFoundException fnfe) {
+				Log.e(TAG, fnfe.getClass().getName() + ": " + fnfe.getMessage());
 				Toast.makeText(MainActivity.this, getText(R.string.cant_open_file) +
-					" " + fnfe.getMessage(), Toast.LENGTH_LONG).show();
+					" " + fnfe.getLocalizedMessage(), Toast.LENGTH_LONG).show();
 				return null;
 			}
 		}
@@ -296,6 +299,7 @@ public class MainActivity extends Activity {
 					db.endTransaction();
 				} catch (final SQLiteConstraintException se) {
 					db.rollback();
+					Log.e(TAG, se.getClass().getName() + ": " + se.getMessage());
 					handler.post(new Runnable() {
 						public void run() {
 							Toast.makeText(MainActivity.this,
@@ -305,10 +309,11 @@ public class MainActivity extends Activity {
 					});
 				} catch (final ImportException ie) {
 					db.rollback();
+					Log.e(TAG, ie.getClass().getName() + ": " + ie.getMessage());
 					handler.post(new Runnable() {
 						public void run() {
-							Toast.makeText(MainActivity.this, ie.getMessage(),
-								Toast.LENGTH_LONG).show();
+							Toast.makeText(MainActivity.this, ie.getLocalizedMessage(),
+									Toast.LENGTH_LONG).show();
 						}
 					});
 				}
@@ -316,10 +321,11 @@ public class MainActivity extends Activity {
 				try {
 					input.close();
 				} catch (final IOException ioe) {
+					Log.e(TAG, ioe.getClass().getName() + ": " + ioe.getMessage());
 					handler.post(new Runnable() {
 						public void run() {
 							Toast.makeText(MainActivity.this, ioe.getClass().getName() +
-								": " + ioe.getMessage(),	Toast.LENGTH_LONG).show();
+								": " + ioe.getLocalizedMessage(),	Toast.LENGTH_LONG).show();
 						}
 					});
 				}
@@ -354,9 +360,10 @@ public class MainActivity extends Activity {
 					exporter.setOutput(output);
 					exporter.exportData(db.getAllCwg());
 				} catch (final ExportException ioe) {
+					Log.e(TAG, ioe.getClass().getName() + ": " + ioe.getMessage());
 					handler.post(new Runnable() {
 						public void run() {
-							Toast.makeText(MainActivity.this, ioe.getMessage(),
+							Toast.makeText(MainActivity.this, ioe.getLocalizedMessage(),
 								Toast.LENGTH_LONG).show();
 						}
 					});
@@ -365,10 +372,11 @@ public class MainActivity extends Activity {
 				try {
 					output.close();
 				} catch (final IOException ioe) {
+					Log.e(TAG, ioe.getClass().getName() + ": " + ioe.getMessage());
 					handler.post(new Runnable() {
 						public void run() {
 							Toast.makeText(MainActivity.this, ioe.getClass().getName() +
-								": " + ioe.getMessage(),	Toast.LENGTH_LONG).show();
+								": " + ioe.getLocalizedMessage(),	Toast.LENGTH_LONG).show();
 						}
 					});
 				}
@@ -590,16 +598,18 @@ public class MainActivity extends Activity {
 								}
 							});
 						} catch (final ClientProtocolException cpe) {
+							Log.e(TAG, cpe.getClass().getName() + ": " + cpe.getMessage());
 							handler.post(new Runnable() {
 								public void run() {
-									Toast.makeText(MainActivity.this, cpe.getClass().getName() + ": " + cpe.getMessage(),
+									Toast.makeText(MainActivity.this, cpe.getClass().getName() + ": " + cpe.getLocalizedMessage(),
 											Toast.LENGTH_LONG).show();
 								}
 							});
 						} catch (final IOException ioe) {
+							Log.e(TAG, ioe.getClass().getName() + ": " + ioe.getMessage());
 							handler.post(new Runnable() {
 								public void run() {
-									Toast.makeText(MainActivity.this, ioe.getClass().getName() + ": " + ioe.getMessage(),
+									Toast.makeText(MainActivity.this, ioe.getClass().getName() + ": " + ioe.getLocalizedMessage(),
 										Toast.LENGTH_LONG).show();
 								}
 							});
@@ -641,7 +651,8 @@ public class MainActivity extends Activity {
 					doImport(catalogImport, new ProgressInputStream(this,
 						input, length));
 				} catch (IOException ioe) {
-					Toast.makeText(this, ioe.getClass().getName() + ": " + ioe.getMessage(),
+					Log.e(TAG, ioe.getClass().getName() + ": " + ioe.getMessage());
+					Toast.makeText(this, ioe.getClass().getName() + ": " + ioe.getLocalizedMessage(),
 							Toast.LENGTH_LONG).show();
 				}
 				return true;
