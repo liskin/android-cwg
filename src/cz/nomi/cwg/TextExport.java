@@ -33,6 +33,7 @@ class TextExport extends Export {
 					"\n")
 					.getBytes("UTF-8"));
 			}
+			cursor.close();
 		} catch (IOException ioe) {
 			throw new ExportException(
 					ioe.getClass().getName() + ": " + ioe.getMessage(),
