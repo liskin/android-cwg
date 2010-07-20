@@ -99,7 +99,10 @@ class CsvImport extends Import {
 							try {
 								int countI = Integer.parseInt(count);
 
-								Cursor cur = db.getCwgByCatalogId(catalogId);
+								Cursor cur = null;
+								if (catalogId != null) {
+									cur = db.getCwgByCatalogId(catalogId);
+								}
 								if (cur == null) {
 									db.addCwg(title, catalogTitle, catalogId, jpg, countI);
 								} else {
