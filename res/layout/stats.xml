@@ -23,38 +23,93 @@
 
     <TableRow>
         <TextView
+            android:text="@string/collection"
             android:layout_column="1"
-            android:text="@string/cwg_count"
+			android:textStyle="bold"
             />
         <TextView
-			android:id="@+id/stats_cwg_count"
+            android:text="@string/unique"
+            android:gravity="right"
+			android:paddingRight="10dp"
+            />
+        <TextView
+            android:text="@string/sum"
             android:gravity="right"
             />
     </TableRow>
     <TableRow>
         <TextView
             android:layout_column="1"
-            android:text="@string/unique_cwg"
+            android:text="@string/total_"
             />
         <TextView
-			android:id="@+id/stats_cwg_unique"
+			android:id="@+id/stats_own_cwg"
+            android:gravity="right"
+			android:paddingRight="10dp"
+            />
+        <TextView
+			android:id="@+id/stats_own_cwg_sum"
+            android:gravity="right"
+            />
+    </TableRow>
+	<TableRow>
+        <TextView
+            android:layout_column="1"
+            android:text="@string/with_catalog_"
+            />
+        <TextView
+			android:id="@+id/stats_own_cwg_with_catalog"
+            android:gravity="right"
+			android:paddingRight="10dp"
+            />
+        <TextView
+			android:id="@+id/stats_own_cwg_sum_with_catalog"
             android:gravity="right"
             />
     </TableRow>
     <TableRow>
         <TextView
             android:layout_column="1"
-            android:text="@string/duplicate_cwg"
+            android:text="@string/without_catalog_"
             />
         <TextView
-			android:id="@+id/stats_cwg_duplicity"
+			android:id="@+id/stats_own_cwg_without_catalog"
+            android:gravity="right"
+			android:paddingRight="10dp"
+            />
+        <TextView
+			android:id="@+id/stats_own_cwg_sum_without_catalog"
             android:gravity="right"
             />
     </TableRow>
     <TableRow>
         <TextView
             android:layout_column="1"
-            android:text="@string/catalog_cwg"
+            android:text="@string/duplicity_"
+            />
+        <TextView
+			android:id="@+id/stats_own_cwg_duplicity"
+            android:gravity="right"
+			android:paddingRight="10dp"
+            />
+        <TextView
+			android:id="@+id/stats_own_cwg_sum_duplicity"
+            android:gravity="right"
+            />
+    </TableRow>
+	
+	<View
+        android:layout_height="12dp"
+	/>
+	
+    <TableRow>
+        <TextView
+            android:layout_column="1"
+            android:text="@string/catalog_"
+            />
+        <TextView
+            android:gravity="right"
+			android:paddingRight="10dp"
             />
         <TextView
 			android:id="@+id/stats_cwg_catalog"

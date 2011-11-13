@@ -32,16 +32,29 @@ public class StatsActivity extends Activity {
 
 		db = new DatabaseAdapter(this);
 		db.open();
+	
+		TextView countOwnCwgSum = (TextView) findViewById(R.id.stats_own_cwg_sum);
+		TextView countOwnCwgSumWithCatalog = (TextView) findViewById(R.id.stats_own_cwg_sum_with_catalog);
+		TextView countOwnCwgSumWithoutCatalog = (TextView) findViewById(R.id.stats_own_cwg_sum_without_catalog);
+		TextView countOwnCwgSumDuplicity = (TextView) findViewById(R.id.stats_own_cwg_sum_duplicity);
 
-		TextView cwgCount = (TextView) findViewById(R.id.stats_cwg_count);
-		TextView cwgUnique = (TextView) findViewById(R.id.stats_cwg_unique);
-		TextView cwgDuplicity = (TextView) findViewById(R.id.stats_cwg_duplicity);
-		TextView cwgCatalog = (TextView) findViewById(R.id.stats_cwg_catalog);
+		TextView countOwnCwg = (TextView) findViewById(R.id.stats_own_cwg);
+		TextView countOwnCwgWithCatalog = (TextView) findViewById(R.id.stats_own_cwg_with_catalog);
+		TextView countOwnCwgWithoutCatalog = (TextView) findViewById(R.id.stats_own_cwg_without_catalog);
+		TextView countOwnCwgDuplicity = (TextView) findViewById(R.id.stats_own_cwg_duplicity);
 
-		cwgCount.setText(Integer.toString(db.countCwgSumCount()));
-		cwgUnique.setText(Integer.toString(db.countCwg()));
-		cwgDuplicity.setText(Integer.toString(db.countCwgDuplicity()));
-		cwgCatalog.setText(Integer.toString(db.countCwgCatalog()));
+		TextView countCwgCatalog = (TextView) findViewById(R.id.stats_cwg_catalog);
+		
+		countOwnCwgSum.setText(Integer.toString(db.countOwnCwgSum()));
+		countOwnCwgSumWithCatalog.setText(Integer.toString(db.countOwnCwgSumWithCatalog()));
+		countOwnCwgSumWithoutCatalog.setText(Integer.toString(db.countOwnCwgSumWithoutCatalog()));
+		countOwnCwgSumDuplicity.setText(Integer.toString(db.countOwnCwgSumDuplicity()));
+
+		countOwnCwg.setText(Integer.toString(db.countOwnCwg()));
+		countOwnCwgWithCatalog.setText(Integer.toString(db.countOwnCwgWithCatalog()));
+		countOwnCwgWithoutCatalog.setText(Integer.toString(db.countOwnCwgWithoutCatalog()));
+		countOwnCwgDuplicity.setText(Integer.toString(db.countOwnCwgDuplicity()));
+		countCwgCatalog.setText(Integer.toString(db.countCwgCatalog()));
 	}
 
 	@Override

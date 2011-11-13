@@ -357,7 +357,7 @@ class DatabaseAdapter {
 		BackupManager.dataChanged(this.context);
 	}
 
-	int countCwgSumCount() {
+	int countOwnCwgSum() {
 		Cursor mCursor =
 				db.query(false, "cwg", new String[]{
 					"SUM(count)",},
@@ -380,7 +380,99 @@ class DatabaseAdapter {
 		return count;
 	}
 
-	int countCwg() {
+	int countOwnCwgSumWithCatalog() {
+		Cursor mCursor =
+				db.query(false, "cwg", new String[]{
+					"SUM(count)",},
+				"catalog_id IS NOT NULL",
+				null,
+				null,
+				null,
+				null,
+				null);
+		if (mCursor == null) {
+			return 0;
+		}
+		if (mCursor.getCount() == 0) {
+			mCursor.close();
+			return 0;
+		}
+		mCursor.moveToFirst();
+		int count = mCursor.getInt(0);
+		mCursor.close();
+		return count;
+	}
+
+	int countOwnCwgSumWithoutCatalog() {
+		Cursor mCursor =
+				db.query(false, "cwg", new String[]{
+					"SUM(count)",},
+				"catalog_id IS NULL",
+				null,
+				null,
+				null,
+				null,
+				null);
+		if (mCursor == null) {
+			return 0;
+		}
+		if (mCursor.getCount() == 0) {
+			mCursor.close();
+			return 0;
+		}
+		mCursor.moveToFirst();
+		int count = mCursor.getInt(0);
+		mCursor.close();
+		return count;
+	}
+
+	int countOwnCwgWithCatalog() {
+		Cursor mCursor =
+				db.query(false, "cwg", new String[]{
+					"COUNT(*)",},
+				"catalog_id IS NOT NULL AND count > 0",
+				null,
+				null,
+				null,
+				null,
+				null);
+		if (mCursor == null) {
+			return 0;
+		}
+		if (mCursor.getCount() == 0) {
+			mCursor.close();
+			return 0;
+		}
+		mCursor.moveToFirst();
+		int count = mCursor.getInt(0);
+		mCursor.close();
+		return count;
+	}
+
+	int countOwnCwgWithoutCatalog() {
+		Cursor mCursor =
+				db.query(false, "cwg", new String[]{
+					"COUNT(*)",},
+				"catalog_id IS NULL",
+				null,
+				null,
+				null,
+				null,
+				null);
+		if (mCursor == null) {
+			return 0;
+		}
+		if (mCursor.getCount() == 0) {
+			mCursor.close();
+			return 0;
+		}
+		mCursor.moveToFirst();
+		int count = mCursor.getInt(0);
+		mCursor.close();
+		return count;
+	}
+	
+	int countOwnCwg() {
 		Cursor mCursor =
 				db.query(false, "cwg", new String[]{
 					"COUNT(*)"},
@@ -403,10 +495,33 @@ class DatabaseAdapter {
 		return count;
 	}
 
-	int countCwgDuplicity() {
+	int countOwnCwgDuplicity() {
 		Cursor mCursor =
 				db.query(false, "cwg", new String[]{
 					"COUNT(*)"},
+				"count > 1",
+				null,
+				null,
+				null,
+				null,
+				null);
+		if (mCursor == null) {
+			return 0;
+		}
+		if (mCursor.getCount() == 0) {
+			mCursor.close();
+			return 0;
+		}
+		mCursor.moveToFirst();
+		int count = mCursor.getInt(0);
+		mCursor.close();
+		return count;
+	}
+
+	int countOwnCwgSumDuplicity() {
+		Cursor mCursor =
+				db.query(false, "cwg", new String[]{
+					"SUM(count - 1)"},
 				"count > 1",
 				null,
 				null,
