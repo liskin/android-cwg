@@ -682,7 +682,11 @@ public class MainActivity extends Activity {
 								HttpURLConnection http = (HttpURLConnection) url.openConnection();
 								ZipInputStream zip = new ZipInputStream(http.getInputStream());
 								input = zip;
-								length = zip.getNextEntry().getSize();
+								if (zip.getNextEntry() != null) {
+									length = zip.getNextEntry().getSize();
+								} else {
+									length = 0;
+								}
 							} else {
 								String catalogUrl = settings.getString("catalog_url",
 									getText(R.string.pref_catalog_url).toString());
