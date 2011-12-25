@@ -66,6 +66,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;
@@ -682,8 +683,9 @@ public class MainActivity extends Activity {
 								HttpURLConnection http = (HttpURLConnection) url.openConnection();
 								ZipInputStream zip = new ZipInputStream(http.getInputStream());
 								input = zip;
-								if (zip.getNextEntry() != null) {
-									length = zip.getNextEntry().getSize();
+								ZipEntry entry = zip.getNextEntry();
+								if (entry != null) {
+									length = entry.getSize();
 								} else {
 									length = 0;
 								}
