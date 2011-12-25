@@ -244,19 +244,27 @@ public class MainActivity extends Activity {
 		db.close();
 	}
 
-	private OutputStream newFileOutput(String fileName) {
+	private OutputStream newFileOutput(Handler handler, String fileName) {
 		File file = Storage.getFile(fileName);
 		if (file == null) {
-			Toast.makeText(MainActivity.this, getText(R.string.cant_open_external_storage),
-					Toast.LENGTH_LONG).show();
+			handler.post(new Runnable() {
+				public void run() {
+					Toast.makeText(MainActivity.this, getText(R.string.cant_open_external_storage),
+							Toast.LENGTH_LONG).show();
+				}
+			});
 			return null;
 		} else {
 			try {
 				return new FileOutputStream(file);
-			} catch (FileNotFoundException fnfe) {
+			} catch (final FileNotFoundException fnfe) {
 				Log.e(TAG, fnfe.getClass().getName() + ": " + fnfe.getMessage());
-				Toast.makeText(MainActivity.this, getText(R.string.cant_open_file) +
-					" " + fnfe.getLocalizedMessage(), Toast.LENGTH_LONG).show();
+				handler.post(new Runnable() {
+					public void run() {
+						Toast.makeText(MainActivity.this, getText(R.string.cant_open_file) +
+							" " + fnfe.getLocalizedMessage(), Toast.LENGTH_LONG).show();
+					}
+				});
 				return null;
 			}
 		}
@@ -265,8 +273,12 @@ public class MainActivity extends Activity {
 	private ProgressInputStream newFileInput(Handler handler, String fileName) {
 		File file = Storage.getFile(fileName);
 		if (file == null) {
-			Toast.makeText(MainActivity.this, getText(R.string.cant_open_external_storage),
-					Toast.LENGTH_LONG).show();
+			handler.post(new Runnable() {
+				public void run() {
+					Toast.makeText(MainActivity.this, getText(R.string.cant_open_external_storage),
+							Toast.LENGTH_LONG).show();
+				}
+			});
 			return null;
 		} else {
 			try {
@@ -275,10 +287,14 @@ public class MainActivity extends Activity {
 						handler,
 						new FileInputStream(file),
 						file.length());
-			} catch (FileNotFoundException fnfe) {
+			} catch (final FileNotFoundException fnfe) {
 				Log.e(TAG, fnfe.getClass().getName() + ": " + fnfe.getMessage());
-				Toast.makeText(MainActivity.this, getText(R.string.cant_open_file) +
-					" " + fnfe.getLocalizedMessage(), Toast.LENGTH_LONG).show();
+				handler.post(new Runnable() {
+					public void run() {
+						Toast.makeText(MainActivity.this, getText(R.string.cant_open_file) +
+						" " + fnfe.getLocalizedMessage(), Toast.LENGTH_LONG).show();
+					}
+				});
 				return null;
 			}
 		}
@@ -495,7 +511,7 @@ public class MainActivity extends Activity {
 				new Thread() {
 					@Override
 					public void run() {
-						doExport(handler, new TextExport(), newFileOutput("cwg.txt"));
+						doExport(handler, new TextExport(), newFileOutput(handler, "cwg.txt"));
 						handler.post(new Runnable() {
 							public void run() {
 								Toast.makeText(MainActivity.this,
@@ -526,7 +542,7 @@ public class MainActivity extends Activity {
 				new Thread() {
 					@Override
 					public void run() {
-						doExport(handler, new CsvExport(), newFileOutput("cwg.csv"));
+						doExport(handler, new CsvExport(), newFileOutput(handler, "cwg.csv"));
 						handler.post(new Runnable() {
 							public void run() {
 								Toast.makeText(MainActivity.this,
