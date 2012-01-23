@@ -65,8 +65,10 @@ class DatabaseAdapter {
 					"catalog_id",
 					"jpg",
 					"count"},
-				"_id = " + id,
-				null,
+				"_id = ?",
+				new String[] {
+					Long.toString(id)
+				},
 				null,
 				null,
 				null);
@@ -219,7 +221,12 @@ class DatabaseAdapter {
 	}
 
 	void deleteCwg(long id) {
-		db.delete("cwg", "_id = " + id, null);
+		db.delete("cwg",
+			"_id = ?",
+			new String[] {
+				Long.toString(id)
+			}
+		);
 
 		BackupManager.dataChanged(this.context);
 	}
@@ -232,23 +239,64 @@ class DatabaseAdapter {
 		val.put("catalog_id", catalogId);
 		val.put("jpg", jpg);
 		val.put("count", count);
-		db.update("cwg", val, "_id = " + id, null);
+		db.update("cwg",
+			val,
+			"_id = ?",
+			new String[] {
+				Long.toString(id)
+			}
+		);
 
 		BackupManager.dataChanged(this.context);
 	}
 
 	void incCwg(long id) {
-		db.execSQL("UPDATE cwg SET count = count + 1 WHERE _id = " + id);
+		Cursor mCursor = db.query(true,
+				"cwg",
+				new String[]{
+					"count"
+				},
+				"_id = ?",
+				new String[]{
+					Long.toString(id)
+				},
+				null,
+				null,
+				null,
+				null);
+		if (mCursor == null) {
+			return;
+		}
+		if (mCursor.getCount() == 0) {
+			mCursor.close();
+			return;
+		}
+		mCursor.moveToFirst();
+		// Update
+		ContentValues val = new ContentValues();
+		val.put("count", mCursor.getInt(0) + 1);
+		db.update("cwg",
+			val,
+			"_id = ?",
+			new String[] {
+				Long.toString(id)
+			}
+		);
+		mCursor.close();
 
 		BackupManager.dataChanged(this.context);
 	}
 
 	void decCwg(long id) {
-		Cursor mCursor =
-				db.query(true, "cwg", new String[]{
-					"count",},
-				"_id = " + id,
-				null,
+		Cursor mCursor = db.query(true,
+				"cwg",
+				new String[]{
+					"count"
+				},
+				"_id = ?",
+				new String[]{
+					Long.toString(id)
+				},
 				null,
 				null,
 				null,
@@ -263,7 +311,15 @@ class DatabaseAdapter {
 		mCursor.moveToFirst();
 		if (mCursor.getInt(0) > 0) {
 			// Update
-			db.execSQL("UPDATE cwg SET count = count - 1 WHERE _id = " + id);
+			ContentValues val = new ContentValues();
+			val.put("count", mCursor.getInt(0) - 1);
+			db.update("cwg",
+				val,
+				"_id = ?",
+				new String[] {
+					Long.toString(id)
+				}
+			);
 
 			BackupManager.dataChanged(this.context);
 		} else {
